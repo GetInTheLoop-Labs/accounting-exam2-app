@@ -1,0 +1,65 @@
+{
+  "jurisdiction": "ca",
+  "builtFrom": "PRD §15.3 research",
+  "verifiedAt": "2026-07-03",
+  "entries": [
+    {
+      "requirementId": "ca-application-initial",
+      "factClass": "fee",
+      "expected": "300",
+      "unit": "usd",
+      "sourceUrl": "https://www.ptbc.ca.gov/applicants/new_grad/fees.shtml",
+      "status": "unverified",
+      "note": "Application processing fee; $300 + $150 initial-license split marked [verify] in PRD — confirm on fees page"
+    },
+    {
+      "requirementId": "ca-fingerprints",
+      "factClass": "fee",
+      "expected": "49",
+      "unit": "usd",
+      "sourceUrl": "https://www.ptbc.ca.gov/applicants/endorsement/fingerprint.shtml",
+      "status": "verified",
+      "note": "Hard-card processing fee for out-of-state applicants; Live Scan vendor/DOJ/FBI fees separate"
+    },
+    {
+      "requirementId": "ca-jurisprudence",
+      "factClass": "fee",
+      "expected": "50",
+      "unit": "usd",
+      "sourceUrl": "https://www.ptbc.ca.gov/applicants/caljam.shtml",
+      "status": "verified",
+      "note": "CAL-JAM, paid to FSBPT"
+    },
+    {
+      "requirementId": "ca-jurisprudence",
+      "factClass": "rule",
+      "expected": "50 questions, 90 minutes, online off-site, 80% to pass, unlimited attempts; must be taken within 96 hours of Authorization to Test",
+      "sourceUrl": "https://www.ptbc.ca.gov/applicants/caljam.shtml",
+      "status": "verified",
+      "note": "CAL-JAM replaced the California Law Exam effective July 1, 2024"
+    },
+    {
+      "requirementId": "ca-license-issuance",
+      "factClass": "wait_time",
+      "expected": "acknowledge receipt within 30 days; license generally issued within 45 days of last fulfilled deficiency",
+      "sourceUrl": "https://www.ptbc.ca.gov/applicants/index.shtml",
+      "status": "verified"
+    },
+    {
+      "requirementId": "ca-ce-renewal",
+      "factClass": "rule",
+      "expected": "30 hours of continuing competency per 2-year renewal cycle, including 4 hours Basic Life Support and 2 hours Ethics/Laws and Regulations",
+      "sourceUrl": "https://www.ptbc.ca.gov/licensees/continuing_competency/",
+      "status": "verified"
+    },
+    {
+      "requirementId": "npte-registration",
+      "factClass": "fee",
+      "expected": "485",
+      "unit": "usd",
+      "sourceUrl": "https://www.fsbpt.org/Our-Services/Candidate-Services/Exam-Registration-Payment",
+      "status": "unverified",
+      "note": "Secondary-corroborated; fsbpt.org blocked automated fetch during research"
+    }
+  ]
+}

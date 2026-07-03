@@ -1,0 +1,67 @@
+{
+  "jurisdiction": "la",
+  "builtFrom": "golden-set research pass",
+  "verifiedAt": "2026-07-03",
+  "entries": [
+    {
+      "requirementId": "la-application-initial",
+      "factClass": "fee",
+      "expected": "200",
+      "unit": "usd",
+      "sourceUrl": "https://www.laptboard.org/page/fees-new-applicants",
+      "status": "verified",
+      "note": "Domestic cashier's check or money order; nonrefundable. A separate initial license/permit line item may exist — confirm the full table on the live page"
+    },
+    {
+      "requirementId": "la-fingerprints",
+      "factClass": "fee",
+      "expected": "60.75",
+      "unit": "usd",
+      "sourceUrl": "https://www.laptboard.org/page/BackgroundCheck",
+      "status": "verified",
+      "note": "State + federal check 'up to $60.75' in-state; out-of-state adds a $39.99 convenience fee"
+    },
+    {
+      "requirementId": "la-jurisprudence",
+      "factClass": "fee",
+      "expected": "0",
+      "unit": "usd",
+      "sourceUrl": "https://www.laptboard.org/index.cfm/page/104",
+      "status": "verified",
+      "note": "Board's jurisprudence exam is explicitly free of charge"
+    },
+    {
+      "requirementId": "la-jurisprudence",
+      "factClass": "rule",
+      "expected": "Online jurisprudence exam required of all applicants: 40 questions drawn from the Louisiana Practice Act and Rules, minimum passing score 75%; also required (passed before applying) for compact privilege holders at initial purchase and renewal",
+      "sourceUrl": "https://www.laptboard.org/index.cfm/page/104",
+      "status": "verified"
+    },
+    {
+      "requirementId": "la-license-issuance",
+      "factClass": "wait_time",
+      "expected": "allow 5-7 business days after the board receives the completed application",
+      "sourceUrl": "https://www.laptboard.org/page/New-Applicant-FAQ",
+      "status": "verified",
+      "note": "Completed-application turnaround guidance, not an end-to-end SLA"
+    },
+    {
+      "requirementId": "la-ce-renewal",
+      "factClass": "rule",
+      "expected": "30 hours of continuing education per 2-year license term: minimum 2 hours jurisprudence, 2 hours ethics/professionalism, 18 hours clinical/preventive; maximum 8 hours administrative; renewal deadline March 31 by birth-year parity",
+      "sourceUrl": "https://www.laptboard.org/page/CEGuide",
+      "status": "verified",
+      "note": "Live-hours requirement removed in 2021; new grads exempt in graduation calendar year; April late renewal adds $120"
+    },
+    {
+      "requirementId": "la-compact-privilege",
+      "factClass": "fee",
+      "expected": "50",
+      "unit": "usd",
+      "sourceUrl": "https://ptcompact.org/State/LA",
+      "status": "verified",
+      "note": "LA remote-state fee $50 + $45 Commission fee (total $95); jurisprudence exam required before purchase; state fee waived for active-duty military and spouses"
+    }
+  ],
+  "omitted": []
+}

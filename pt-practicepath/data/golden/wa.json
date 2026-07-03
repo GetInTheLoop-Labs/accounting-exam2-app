@@ -1,0 +1,45 @@
+{
+  "jurisdiction": "wa",
+  "builtFrom": "golden-set research pass",
+  "verifiedAt": "2026-07-03",
+  "entries": [
+    {
+      "requirementId": "wa-application-initial",
+      "factClass": "fee",
+      "expected": "300",
+      "unit": "usd",
+      "sourceUrl": "https://app.leg.wa.gov/wac/default.aspx?cite=246-915-990",
+      "status": "unverified",
+      "note": "Per WAC 246-915-990 (renewal $200/yr, annual birthday renewal) via indexed mirrors; a stale secondary source showed $100/$75, indicating a fee change occurred — re-check against live WAC/DOH fees page"
+    },
+    {
+      "requirementId": "wa-jurisprudence",
+      "factClass": "rule",
+      "expected": "Effective 2026-01-01 the WA jurisprudence exam is no longer a pre-licensure requirement; licensees licensed on/after that date complete it once during their first full CE cycle. 16 questions, minimum passing score 70%; no fee (counts as 1 free CE hour)",
+      "sourceUrl": "https://doh.wa.gov/licenses-permits-and-certificates/professions-new-renew-or-update/physical-therapist-and-physical-therapist-assistant/exam-reference",
+      "status": "verified",
+      "note": "Material rule change — pre-2026 guides stating a pre-licensure JP exam are now wrong"
+    },
+    {
+      "requirementId": "wa-ce-renewal",
+      "factClass": "rule",
+      "expected": "PT: 32 hours of continuing education every 2 years plus 200 hours of active practice application every 2 years; 2 hours health equity CE per cycle; one-time 3-hour suicide prevention training; spinal manipulation endorsement adds 10 hours per cycle",
+      "sourceUrl": "https://doh.wa.gov/licenses-permits-and-certificates/professions-new-renew-or-update/physical-therapist-and-physical-therapist-assistant/continuing-education",
+      "status": "verified",
+      "note": "License renews annually; CE reported on a 2-year cycle; confirmed against WAC 246-915-085"
+    },
+    {
+      "requirementId": "wa-compact-privilege",
+      "factClass": "fee",
+      "expected": "45",
+      "unit": "usd",
+      "sourceUrl": "https://ptcompact.org/State/WA",
+      "status": "verified",
+      "note": "WA remote-state fee $45 + $2 processing, on top of the $45 Commission fee (total $92); DOH rulemaking in progress may raise compact fees"
+    }
+  ],
+  "omitted": [
+    "wa-fingerprints: no separately stated PT fingerprint fee; fingerprint checks only when triggered by background-question review",
+    "wa-license-issuance: DOH publishes only 'a few days to a few weeks' guidance plus a live status page — no fixed figure to pin"
+  ]
+}

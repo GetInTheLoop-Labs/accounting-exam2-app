@@ -1,0 +1,52 @@
+{
+  "jurisdiction": "nv",
+  "builtFrom": "golden-set research pass",
+  "verifiedAt": "2026-07-03",
+  "entries": [
+    {
+      "requirementId": "nv-application-initial",
+      "factClass": "fee",
+      "expected": "300",
+      "unit": "usd",
+      "sourceUrl": "https://ptboard.nv.gov/Licensure/Fee_Schedule/",
+      "status": "verified",
+      "note": "Consistent with the NRS 640 statutory cap of $300"
+    },
+    {
+      "requirementId": "nv-fingerprints",
+      "factClass": "fee",
+      "expected": "39",
+      "unit": "usd",
+      "sourceUrl": "https://ptboard.nv.gov/uploadedFiles/ptboardnvgov/content/docs/Fingerprint-Information-Packet.pdf",
+      "status": "verified",
+      "note": "Fingerprints expire 6 months after submission"
+    },
+    {
+      "requirementId": "nv-jurisprudence",
+      "factClass": "rule",
+      "expected": "NVJAM (Nevada Jurisprudence Assessment Module) required for initial licensure: open-book online exam on NRS/NAC Chapter 640, pass mark 80% (16 correct)",
+      "sourceUrl": "https://ptboard.nv.gov/uploadedFiles/ptboardnvgov/content/Licensure/PT-PTA-ExamApplicantsPresentation.pdf",
+      "status": "verified",
+      "note": "Also required BEFORE applying for a Nevada compact privilege; no separate NVJAM fee published on official pages"
+    },
+    {
+      "requirementId": "nv-license-issuance",
+      "factClass": "wait_time",
+      "expected": "approximately 3-4 weeks with electronic fingerprint submission; approximately 6-8 weeks with hard-card fingerprints",
+      "sourceUrl": "https://ptboard.nv.gov/uploadedFiles/ptboardnvgov/content/Applicants/EndorsementCandidate2024%20-%20Copy.pdf",
+      "status": "verified",
+      "note": "Board's own estimates, not guarantees"
+    },
+    {
+      "requirementId": "nv-ce-renewal",
+      "factClass": "rule",
+      "expected": "15 continuing competency units (CCUs) within the year immediately preceding license renewal; from Jan 1, 2025 must include 1 CCU on Cultural, Access, and Ethical Standards; reported via CE Broker",
+      "sourceUrl": "https://ptboard.nv.gov/CE/",
+      "status": "verified"
+    }
+  ],
+  "omitted": [
+    "nv-compact-privilege fee: NV issuing since 2026-01-20 (board compact page) but the remote-state fee amount is not indexable on official domains — confirm on ptcompact.org fee chart",
+    "NVJAM fee: no dollar amount published on official pages"
+  ]
+}

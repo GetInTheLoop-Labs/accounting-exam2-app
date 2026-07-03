@@ -1,0 +1,50 @@
+{
+  "jurisdiction": "ny",
+  "builtFrom": "PRD §15.3 research",
+  "verifiedAt": "2026-07-03",
+  "entries": [
+    {
+      "requirementId": "ny-application-initial",
+      "factClass": "fee",
+      "expected": "294",
+      "unit": "usd",
+      "sourceUrl": "https://www.op.nysed.gov/professions/physical-therapists/license-requirements",
+      "status": "verified",
+      "note": "Licensure and first registration; $70 limited permit is separate"
+    },
+    {
+      "requirementId": "ny-application-endorsement",
+      "factClass": "fee",
+      "expected": "294",
+      "unit": "usd",
+      "sourceUrl": "https://www.op.nysed.gov/professions/physical-therapists/license-application-forms",
+      "status": "verified",
+      "note": "Same Form 1 + fee as initial, plus Form 3 (certification from each prior jurisdiction) and Form 4"
+    },
+    {
+      "requirementId": "ny-application-initial",
+      "factClass": "rule",
+      "expected": "No state jurisprudence exam; no fingerprint-based background check published among NYSED PT application requirements",
+      "sourceUrl": "https://www.op.nysed.gov/professions/physical-therapists/license-requirements",
+      "status": "unverified",
+      "note": "Negative finding from research — confirm before treating as ground truth"
+    },
+    {
+      "requirementId": "ny-ce-renewal",
+      "factClass": "rule",
+      "expected": "36 contact hours per 3-year registration period",
+      "sourceUrl": "https://www.op.nysed.gov/professions/physical-therapists/continuing-education/faqs",
+      "status": "verified",
+      "note": "Mandatory since September 1, 2009; triennial registration fee $224"
+    },
+    {
+      "requirementId": "npte-registration",
+      "factClass": "fee",
+      "expected": "485",
+      "unit": "usd",
+      "sourceUrl": "https://www.fsbpt.org/Our-Services/Candidate-Services/Exam-Registration-Payment",
+      "status": "unverified",
+      "note": "Secondary-corroborated; fsbpt.org blocked automated fetch during research"
+    }
+  ]
+}

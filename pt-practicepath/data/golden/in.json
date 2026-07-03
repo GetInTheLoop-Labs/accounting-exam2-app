@@ -1,0 +1,45 @@
+{
+  "jurisdiction": "in",
+  "builtFrom": "golden-set research pass",
+  "verifiedAt": "2026-07-03",
+  "entries": [
+    {
+      "requirementId": "in-application-initial",
+      "factClass": "fee",
+      "expected": "100",
+      "unit": "usd",
+      "sourceUrl": "https://www.in.gov/pla/professions/physical-therapy-home/physical-therapy-licensing-information/",
+      "status": "verified",
+      "note": "Application by examination, nonrefundable; NPTE $485 to FSBPT separate; temporary permit $50; re-exam $50"
+    },
+    {
+      "requirementId": "in-fingerprints",
+      "factClass": "fee",
+      "expected": "38.20",
+      "unit": "usd",
+      "sourceUrl": "https://www.in.gov/isp/criminal-history-services/get-national-criminal-history/",
+      "status": "unverified",
+      "note": "Requirement itself verified (IC 25-1-1.1-4, via IdentoGO, applicant cost); the $38.20 amount comes from an ISP page with stale update notes and a conflicting vendor line item — hand-check first"
+    },
+    {
+      "requirementId": "in-ce-renewal",
+      "factClass": "rule",
+      "expected": "22 hours of continuing competency per biennial renewal period, including 2 hours of ethics and Indiana jurisprudence coursework; licenses expire June 30 of even-numbered years; renewal fee $100",
+      "sourceUrl": "https://www.in.gov/pla/professions/physical-therapy-home/physical-therapy-licensing-information/",
+      "status": "verified"
+    },
+    {
+      "requirementId": "in-compact-privilege",
+      "factClass": "fee",
+      "expected": "100",
+      "unit": "usd",
+      "sourceUrl": "https://www.in.gov/pla/files/IPLA-Press-Release-PT-Compact-Implemented-and-Live-in-Indiana-Beginning-Thursday,-April-20,-2023.pdf",
+      "status": "unverified",
+      "note": "IN state fee $100 + $45 Commission fee (total $145) per the April 2023 implementation press release; live ptcompact.org fee chart not indexable — confirm currency. No jurisprudence exam required for an IN privilege"
+    }
+  ],
+  "omitted": [
+    "in-jurisprudence: no jurisprudence exam for licensure or compact privilege — appears only as a 2-hour CE topic, captured under in-ce-renewal",
+    "in-license-issuance: no published processing time on PLA pages (the PLA data dashboard at in.gov/pla/data/ is the live wait-time source)"
+  ]
+}
