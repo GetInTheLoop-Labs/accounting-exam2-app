@@ -8,11 +8,13 @@
 
 Hello,
 
-I'm building PT PracticePath, a tool that helps PTs and PTAs choose their
-fastest path to practice in a new state. For a large share of our users the
-right answer is a compact privilege — so the compact's data is central to
-what we show: which jurisdictions are actively issuing and accepting,
-per-state privilege fees, and jurisprudence prerequisites.
+I'm preparing to launch PT PracticePath as a beta for PTs and PTAs choosing
+their fastest path to practice in a new state. For a large share of our
+users the right answer is a compact privilege — so the compact's data is
+central to what we show: which jurisdictions are actively issuing and
+accepting, per-state privilege fees, and jurisprudence prerequisites. We're
+reaching out ahead of the beta because we want the compact represented
+accurately from the first user onward.
 
 Today we cite ptcompact.org as the authoritative source for all of it, but
 we can't verify programmatically: the compact map and the privilege
