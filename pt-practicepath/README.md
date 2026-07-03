@@ -1,7 +1,8 @@
-# PT PracticePath — Phase 0: Foundation
+# PT PracticePath — Phase 0 foundation + Phase 1 engine/API
 
-Implements [issue #2](../../issues/2) per [the PRD](../docs/PRD.md) (§8.2 knowledge
-base, §9.3 source access strategy, §13 Phase 0).
+Implements [issue #2](../../issues/2) and the engine/API layers of
+[issue #3](../../issues/3) per [the PRD](../docs/PRD.md) (§8.2 knowledge base,
+§8.6 API surface, §9.3 source access strategy, §13 Phases 0–1).
 
 ## What's here
 
@@ -14,8 +15,10 @@ base, §9.3 source access strategy, §13 Phase 0).
 | `src/sources/boards.ts` | Enumeration output (2026-07-03): board name/URL + fee, application, endorsement, and processing-time pages for the other 49 jurisdictions, located via official-domain web research with per-entry confidence and notes. URLs are search-index-confirmed; the production census probe live-verifies each before rung assignment |
 | `src/census/probe.ts` | The access census (PRD §9.3.1): probes every located source, records robots policy / HTTP status / bot-protection signals, writes `census/access-matrix.{json,md}` with per-source escalation-ladder classifications |
 | `src/seeding/` | **Seeding agents + human review tooling**: polite fetcher with evidence snapshots (`fetcher.ts`), schema-constrained Claude extraction (`extractor.ts`, structured outputs on `claude-opus-4-8`), canonical requirement ids (`requirements.ts`), review decisions and markdown reports (`review.ts`), golden-set accuracy audit (`audit.ts`), and the CLI (`cli.ts`) |
-| `data/golden/` | Golden set for the seeding-accuracy audit (Phase 0 exit: ≥ 99%). Texas seeded; ~9 states to go |
-| `test/` | Registry integrity, freshness-window, and seeding-pipeline tests |
+| `data/golden/` | Golden set for the seeding-accuracy audit (Phase 0 exit: ≥ 99%) — 10 jurisdictions |
+| `src/engine/` | **Phase 1 engine**: licensure-path evaluation (FR-11, `paths.ts`), action-plan sequencing with critical path (FR-15, `sequence.ts`), and the Practice Requirements Report assembler with freshness-honest facts and cost totals (FR-14/16/22/30, `report.ts`) + demo CLI |
+| `src/api/` | **HTTP API** (PRD §8.6, dependency-free node:http): `/v1/parse` (Mode C; A/B 501 until Phase 2), `/v1/reports` (+ fetch/reverify), `/v1/jurisdictions` coverage map. Fact source is a pluggable `FactStore` — golden-backed in dev, KB + validation pipeline in production |
+| `test/` | Registry, freshness, seeding-pipeline, golden-set, engine, and API tests |
 
 ## Usage
 
@@ -24,6 +27,10 @@ npm install
 npm test          # registry integrity + freshness windows + seeding pipeline
 npm run typecheck
 CENSUS_ENV="describe your egress here" npm run census   # writes census/access-matrix.{json,md}
+
+# Engine + API (pure logic, run anywhere):
+npm run report -- la --licensed-in tx --home tx   # demo report from golden facts
+npm run api 3000                                  # HTTP API on :3000
 
 # Seeding pipeline (needs Anthropic credentials + production-realistic egress):
 npm run seed -- tx                       # fetch sources, extract → data/seeds/tx.json (pending review)
