@@ -1,0 +1,72 @@
+{
+  "jurisdiction": "tx",
+  "builtFrom": "PRD §15.3 research",
+  "verifiedAt": "2026-07-03",
+  "entries": [
+    {
+      "requirementId": "tx-application-initial",
+      "factClass": "fee",
+      "expected": "190",
+      "unit": "usd",
+      "sourceUrl": "https://texreg.sos.state.tx.us/public/readtac$ext.TacPage?sl=R&app=9&pg=1&ti=22&pt=28&ch=651&rl=2",
+      "status": "unverified",
+      "note": "Secondary-sourced; confirm against 22 TAC §651.2 before audit use"
+    },
+    {
+      "requirementId": "tx-fingerprints",
+      "factClass": "fee",
+      "expected": "38.25",
+      "unit": "usd",
+      "sourceUrl": "https://ptot.texas.gov/wp-content/uploads/2025/02/Procedures-for-Fingerprints_2.2.2022.pdf",
+      "status": "verified"
+    },
+    {
+      "requirementId": "tx-jurisprudence-jam",
+      "factClass": "fee",
+      "expected": "0",
+      "unit": "usd",
+      "sourceUrl": "https://ptot.texas.gov/pt-jam/",
+      "status": "verified",
+      "note": "Free for initial licensure; $48 (+1.6% card fee) on renewal/restoration"
+    },
+    {
+      "requirementId": "tx-jurisprudence-jam",
+      "factClass": "rule",
+      "expected": "75 multiple-choice questions, open-book, online on-demand, 140-minute limit, 80% to pass",
+      "sourceUrl": "https://ptot.texas.gov/pt-jam/",
+      "status": "verified"
+    },
+    {
+      "requirementId": "tx-license-issuance",
+      "factClass": "wait_time",
+      "expected": "1-4 days once all required items received; may practice upon online verification",
+      "sourceUrl": "https://ptot.texas.gov/how-long-does-it-take-to-get-a-license/",
+      "status": "verified"
+    },
+    {
+      "requirementId": "tx-compact-privilege",
+      "factClass": "fee",
+      "expected": "95",
+      "unit": "usd",
+      "sourceUrl": "https://ptot.texas.gov/compact/",
+      "status": "verified",
+      "note": "$45 Commission fee + $50 Texas state fee"
+    },
+    {
+      "requirementId": "tx-ce-renewal",
+      "factClass": "rule",
+      "expected": "30 CCUs per 2-year cycle incl. TX JAM and HHS-approved human trafficking prevention course",
+      "sourceUrl": "https://ptot.texas.gov/cc-ce/",
+      "status": "verified"
+    },
+    {
+      "requirementId": "npte-registration",
+      "factClass": "fee",
+      "expected": "485",
+      "unit": "usd",
+      "sourceUrl": "https://www.fsbpt.org/Our-Services/Candidate-Services/Exam-Registration-Payment",
+      "status": "unverified",
+      "note": "Secondary-corroborated; fsbpt.org blocked automated fetch during research"
+    }
+  ]
+}

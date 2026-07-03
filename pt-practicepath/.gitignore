@@ -1,0 +1,4 @@
+node_modules/
+# Census output is environment-specific measurement data; generate per-run
+# with `npm run census` and archive production runs elsewhere.
+census/
