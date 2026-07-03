@@ -1,0 +1,65 @@
+{
+  "jurisdiction": "fl",
+  "builtFrom": "PRD §15.3 research",
+  "verifiedAt": "2026-07-03",
+  "entries": [
+    {
+      "requirementId": "fl-application-initial",
+      "factClass": "fee",
+      "expected": "180",
+      "unit": "usd",
+      "sourceUrl": "https://floridasphysicaltherapy.gov/applications/application-pt.pdf",
+      "status": "verified",
+      "note": "$100 application + $75 initial licensure + $5 unlicensed activity; app fee non-refundable"
+    },
+    {
+      "requirementId": "fl-application-endorsement",
+      "factClass": "fee",
+      "expected": "175",
+      "unit": "usd",
+      "sourceUrl": "https://www.flsenate.gov/Laws/Statutes/2024/Chapter486/All",
+      "status": "verified",
+      "note": "MOBILE Act endorsement pathway (effective July 1, 2024): nonrefundable fee capped at $175"
+    },
+    {
+      "requirementId": "fl-jurisprudence",
+      "factClass": "fee",
+      "expected": "65",
+      "unit": "usd",
+      "sourceUrl": "https://floridasphysicaltherapy.gov/florida-ptpta-laws-and-rules-exam/",
+      "status": "verified",
+      "note": "Florida PT/PTA Laws and Rules Exam, administered by FSBPT"
+    },
+    {
+      "requirementId": "fl-fingerprints",
+      "factClass": "rule",
+      "expected": "Level 2 (state + federal) background screening required before initial licensure, effective July 1, 2025 (s. 456.0135, F.S.); existing licensees screen at first renewal after that date",
+      "sourceUrl": "https://flhealthsource.gov/background-screening/",
+      "status": "verified"
+    },
+    {
+      "requirementId": "fl-license-issuance",
+      "factClass": "wait_time",
+      "expected": "applications reviewed within 15 days of receipt; documents submitted after initial review added within 14 business days",
+      "sourceUrl": "https://floridasphysicaltherapy.gov/licensing-renewals/",
+      "status": "unverified",
+      "note": "Board figure quoted via secondary source during research — confirm on the licensing-renewals page"
+    },
+    {
+      "requirementId": "fl-ce-renewal",
+      "factClass": "rule",
+      "expected": "24 hours per 2-year biennium including 2 hours Prevention of Medical Errors each cycle; 1 hour HIV/AIDS at first renewal; max 12 hours home study",
+      "sourceUrl": "https://fpta.org/continuing-education/license-requirements/",
+      "status": "verified"
+    },
+    {
+      "requirementId": "npte-registration",
+      "factClass": "fee",
+      "expected": "485",
+      "unit": "usd",
+      "sourceUrl": "https://www.fsbpt.org/Our-Services/Candidate-Services/Exam-Registration-Payment",
+      "status": "unverified",
+      "note": "Secondary-corroborated; fsbpt.org blocked automated fetch during research"
+    }
+  ]
+}
