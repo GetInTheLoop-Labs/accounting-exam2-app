@@ -16,15 +16,29 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { JURISDICTIONS, SOURCES } from '../sources/registry.js';
-import { assembleReport, type Report } from '../engine/report.js';
+import { assembleReport, type PositionContext, type Report } from '../engine/report.js';
 import { UnknownJurisdictionError, type TherapistProfile } from '../engine/paths.js';
+import { NotAPtPositionError, parsePositionText, parsePositionUrl, type MessagesClient } from '../position/extract.js';
+import { FetchBlockedError } from '../seeding/fetcher.js';
+import type { PracticeSetting } from '../position/types.js';
 import { GoldenFactStore, type FactStore } from './facts.js';
 
 interface StoredReport {
   id: string;
   jurisdiction: string;
   profile: TherapistProfile;
+  position?: PositionContext;
   report: Report;
+}
+
+export interface ApiOptions {
+  factStore?: FactStore;
+  /** Injectable LLM client for /v1/parse Modes A/B (tests use a stub). */
+  parseClient?: MessagesClient;
+}
+
+function llmCredentialsPresent(): boolean {
+  return Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
 }
 
 interface ParsedPosition {
@@ -66,7 +80,10 @@ function normalizeProfile(input: unknown): TherapistProfile {
   };
 }
 
-export function createApiServer(factStore: FactStore = new GoldenFactStore()): Server {
+export function createApiServer(options: FactStore | ApiOptions = {}): Server {
+  // Back-compat: a bare FactStore may be passed directly.
+  const opts: ApiOptions = 'factsFor' in options ? { factStore: options } : options;
+  const factStore = opts.factStore ?? new GoldenFactStore();
   const reports = new Map<string, StoredReport>();
 
   async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
@@ -103,12 +120,30 @@ export function createApiServer(factStore: FactStore = new GoldenFactStore()): S
     if (route === 'POST /v1/parse') {
       const body = (await readBody(req)) as Record<string, unknown>;
       if (typeof body.text === 'string' || typeof body.url === 'string') {
-        sendError(
-          res,
-          501,
-          'not_implemented',
-          'Position-description and URL parsing (Modes A/B) arrive in Phase 2; use {"location": {"state": "..."}} for now',
-        );
+        if (!opts.parseClient && !llmCredentialsPresent()) {
+          sendError(
+            res,
+            503,
+            'llm_unavailable',
+            'Position parsing needs Anthropic credentials (set ANTHROPIC_API_KEY); use {"location": {"state": "..."}} meanwhile',
+          );
+          return;
+        }
+        try {
+          const position =
+            typeof body.text === 'string'
+              ? await parsePositionText(body.text, opts.parseClient)
+              : await parsePositionUrl(body.url as string, opts.parseClient);
+          sendJson(res, 200, { position });
+        } catch (err) {
+          if (err instanceof NotAPtPositionError) {
+            sendError(res, 422, 'not_pt_position', err.message);
+          } else if (err instanceof FetchBlockedError) {
+            sendError(res, 422, 'fetch_blocked', err.message);
+          } else {
+            throw err;
+          }
+        }
         return;
       }
       const location = body.location as { state?: string; city?: string } | undefined;
@@ -133,17 +168,29 @@ export function createApiServer(factStore: FactStore = new GoldenFactStore()): S
 
     if (route === 'POST /v1/reports') {
       const body = (await readBody(req)) as Record<string, unknown>;
-      const position = body.position as { jurisdiction?: string } | undefined;
+      const position = body.position as
+        | { jurisdiction?: string; setting?: PracticeSetting; statedRequirements?: string[] }
+        | undefined;
       const jurisdiction = position?.jurisdiction?.toLowerCase();
       if (!jurisdiction) {
         sendError(res, 400, 'invalid_request', 'Provide {"position": {"jurisdiction": "<code>"}}');
         return;
       }
       const profile = normalizeProfile(body.profile);
+      const heldCredentials = Array.isArray((body.profile as Record<string, unknown> | undefined)?.certifications)
+        ? ((body.profile as Record<string, unknown>).certifications as unknown[]).map(String)
+        : [];
+      const positionContext: PositionContext = {
+        ...(position?.setting ? { setting: position.setting } : {}),
+        ...(Array.isArray(position?.statedRequirements)
+          ? { statedRequirements: position.statedRequirements.map(String) }
+          : {}),
+        heldCredentials,
+      };
       const facts = await factStore.factsFor(jurisdiction);
-      const report = assembleReport(jurisdiction, profile, facts);
+      const report = assembleReport(jurisdiction, profile, facts, new Date(), positionContext);
       const id = randomUUID();
-      reports.set(id, { id, jurisdiction, profile, report });
+      reports.set(id, { id, jurisdiction, profile, position: positionContext, report });
       sendJson(res, 201, { id, report });
       return;
     }
@@ -161,7 +208,7 @@ export function createApiServer(factStore: FactStore = new GoldenFactStore()): S
       }
       if (req.method === 'POST' && reportMatch[2]) {
         const facts = await factStore.factsFor(stored.jurisdiction);
-        stored.report = assembleReport(stored.jurisdiction, stored.profile, facts);
+        stored.report = assembleReport(stored.jurisdiction, stored.profile, facts, new Date(), stored.position);
         sendJson(res, 200, { id: stored.id, report: stored.report });
         return;
       }

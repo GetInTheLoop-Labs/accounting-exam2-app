@@ -13,6 +13,8 @@
 
 import { FRESHNESS_WINDOW_MS, freshnessOf } from '../kb/freshness.js';
 import type { Fact } from '../kb/types.js';
+import { positionLayer } from '../position/templates.js';
+import type { PositionRequirement, PracticeSetting } from '../position/types.js';
 import { evaluatePaths, type PathOption, type TherapistProfile } from './paths.js';
 import { planForPath, type DurationRange, type Plan } from './sequence.js';
 
@@ -48,12 +50,21 @@ export interface PathReport {
   cost: CostSummary;
 }
 
+export interface PositionContext {
+  setting?: PracticeSetting;
+  statedRequirements?: string[];
+  /** Credentials the therapist already holds (FR-17 gap analysis). */
+  heldCredentials?: string[];
+}
+
 export interface Report {
   jurisdiction: string;
   generatedAt: string;
   recommended: PathReport;
   alternatives: PathReport[];
   blocked: PathOption[];
+  /** FR-12 position-specific layer, present when a setting or stated requirements were given. */
+  position?: { setting?: PracticeSetting; requirements: PositionRequirement[] };
   /** True when any presented fact is stale or any duration is an estimate. */
   containsUnverifiedData: boolean;
 }
@@ -158,6 +169,7 @@ export function assembleReport(
   profile: TherapistProfile,
   facts: Fact[],
   now: Date = new Date(),
+  position?: PositionContext,
 ): Report {
   const paths = evaluatePaths(targetId, profile);
   const viable = paths.filter((p) => p.viable);
@@ -172,12 +184,25 @@ export function assembleReport(
       r.requirements.some((req) => req.facts.some((f) => f.presentation === 'stale_last_known_good')),
   );
 
+  const positionRequirements =
+    position && (position.setting || (position.statedRequirements?.length ?? 0) > 0)
+      ? positionLayer(position.setting, position.statedRequirements, position.heldCredentials)
+      : undefined;
+
   return {
     jurisdiction: targetId.toLowerCase(),
     generatedAt: now.toISOString(),
     recommended,
     alternatives,
     blocked,
+    ...(positionRequirements
+      ? {
+          position: {
+            ...(position?.setting ? { setting: position.setting } : {}),
+            requirements: positionRequirements,
+          },
+        }
+      : {}),
     containsUnverifiedData,
   };
 }

@@ -67,10 +67,60 @@ describe('POST /v1/parse', () => {
     expect((await post('/v1/parse', {})).status).toBe(400);
   });
 
-  it('returns 501 for Modes A/B until Phase 2', async () => {
+  it('returns typed 503 for Modes A/B when no LLM credentials are configured', async () => {
+    delete process.env.ANTHROPIC_API_KEY;
+    delete process.env.ANTHROPIC_AUTH_TOKEN;
     const { status, json } = await post('/v1/parse', { text: 'Outpatient PT, Austin TX...' });
-    expect(status).toBe(501);
-    expect(json.error.type).toBe('not_implemented');
+    expect(status).toBe(503);
+    expect(json.error.type).toBe('llm_unavailable');
+  });
+});
+
+describe('POST /v1/parse — Mode A with injected client', () => {
+  it('parses postings and normalizes stated requirements', async () => {
+    const stub = {
+      messages: {
+        create: async () => ({
+          stop_reason: 'end_turn',
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                role: 'PT',
+                state: 'la',
+                city: 'New Orleans',
+                setting: 'home_health',
+                specialty: null,
+                employer: 'Bayou Home Care',
+                statedRequirements: ['BLS', "driver's license"],
+                evidence: ['Home Health PT — New Orleans, LA'],
+              }),
+            },
+          ],
+        }),
+      },
+    };
+    const local = createApiServer({ parseClient: stub });
+    await new Promise<void>((resolve) => local.listen(0, resolve));
+    const port = (local.address() as AddressInfo).port;
+    try {
+      const res = await fetch(`http://127.0.0.1:${port}/v1/parse`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text: 'Home Health PT — New Orleans, LA. BLS required.' }),
+      });
+      const json = (await res.json()) as any;
+      expect(res.status).toBe(200);
+      expect(json.position).toMatchObject({
+        role: 'PT',
+        jurisdiction: 'la',
+        setting: 'home_health',
+        needsConfirmation: true,
+      });
+      expect(json.position.statedRequirements).toContain('bls-cpr');
+    } finally {
+      await new Promise<void>((resolve) => local.close(() => resolve()));
+    }
   });
 });
 
@@ -94,6 +144,28 @@ describe('reports lifecycle', () => {
     expect(Date.parse(reverified.json.report.generatedAt)).toBeGreaterThanOrEqual(
       Date.parse(created.json.report.generatedAt),
     );
+  });
+
+  it('includes the position layer with gap analysis when setting given (FR-12/FR-17)', async () => {
+    const { status, json } = await post('/v1/reports', {
+      position: { jurisdiction: 'la', setting: 'home_health', statedRequirements: ['BLS'] },
+      profile: { licensedIn: ['tx'], homeState: 'tx', certifications: ['bls'] },
+    });
+    expect(status).toBe(201);
+    const reqs = json.report.position.requirements;
+    const bls = reqs.find((r: any) => r.id === 'bls-cpr');
+    expect(bls.basis).toBe('employer_stated');
+    expect(bls.status).toBe('satisfied');
+    expect(reqs[0].basis).toBe('legal'); // authority ordering
+    expect(reqs.find((r: any) => r.id === 'home-health-background').status).toBe('needed');
+  });
+
+  it('omits the position layer without setting or stated requirements', async () => {
+    const { json } = await post('/v1/reports', {
+      position: { jurisdiction: 'la' },
+      profile: { licensedIn: ['tx'], homeState: 'tx' },
+    });
+    expect(json.report.position).toBeUndefined();
   });
 
   it('new-grad profile gets initial licensure recommended', async () => {

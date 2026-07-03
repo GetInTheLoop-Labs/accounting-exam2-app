@@ -116,6 +116,17 @@
   }
   .go:hover { filter: brightness(1.06); }
   .go[disabled] { opacity: 0.55; cursor: wait; }
+  .go.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  details.paste > summary { cursor: pointer; font-size: 13px; font-weight: 650; color: var(--accent); }
+  .field textarea {
+    font: inherit; font-size: 13px; color: var(--ink);
+    background: var(--card); border: 1px solid var(--line); border-radius: 6px;
+    padding: 8px 10px; resize: vertical;
+  }
+  .pill.basis-legal { background: var(--accent-soft); color: var(--accent); }
+  .pill.basis-payer { background: var(--accent-soft); color: var(--accent); opacity: 0.8; }
+  .pill.basis-stated { background: var(--good-soft); color: var(--good); }
+  .pill.basis-norm { background: transparent; color: var(--muted); border: 1px dashed var(--line); }
   .rail-note { font-size: 12px; color: var(--muted); margin-top: auto; }
 
   /* ── Main pane ──────────────────────────────────────────────────── */
@@ -240,10 +251,38 @@
       <input type="text" id="home" placeholder="e.g. tx" autocomplete="off">
     </div>
 
+    <div class="field">
+      <label for="setting">Practice setting (optional)</label>
+      <select id="setting">
+        <option value="">— any / not sure —</option>
+        <option value="outpatient">Outpatient</option>
+        <option value="acute_care">Acute care</option>
+        <option value="snf">Skilled nursing (SNF)</option>
+        <option value="home_health">Home health</option>
+        <option value="schools">Schools / pediatrics</option>
+        <option value="private_practice">Private practice</option>
+        <option value="travel">Travel</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="certs">Credentials you hold (comma-sep)</label>
+      <input type="text" id="certs" placeholder="e.g. bls, npi" autocomplete="off">
+    </div>
+
     <label class="check">
       <input type="checkbox" id="discipline">
       <span>Disciplinary action against any license within the last 2 years</span>
     </label>
+
+    <details class="paste">
+      <summary>Paste a job posting instead</summary>
+      <div class="field" style="margin-top:8px">
+        <textarea id="posting" rows="6" placeholder="Paste the full job description — role, location, setting, and stated requirements will be read for your confirmation."></textarea>
+        <button class="go secondary" id="parse" type="button">Read posting</button>
+        <span class="hint" id="parse-hint"></span>
+      </div>
+    </details>
 
     <button class="go" id="go">Generate report</button>
 
@@ -358,6 +397,32 @@
       pr.requirements.map(function (r) { return reqCard(r, pr.plan); }).join('');
   }
 
+  var BASIS_LABEL = {
+    legal: ['basis-legal', 'required by law'],
+    payer: ['basis-payer', 'payer / regulator'],
+    employer_stated: ['basis-stated', 'stated in posting'],
+    employer_norm: ['basis-norm', 'common in setting']
+  };
+
+  function positionSection(pos) {
+    if (!pos) return '';
+    return '<h2 class="path-head">Position requirements' +
+      (pos.setting ? ' <span class="pill kind">' + esc(pos.setting.replace('_', ' ')) + '</span>' : '') +
+      '</h2><p class="path-meta">Beyond the license: what this setting and posting add (FR-12), matched against your credentials.</p>' +
+      pos.requirements.map(function (r) {
+        var b = BASIS_LABEL[r.basis] || ['basis-norm', r.basis];
+        var status = r.status === 'satisfied'
+          ? '<span class="pill verified">✓ you have this</span>'
+          : '<span class="pill stale">needed</span>';
+        return '<article class="req"><div class="req-head">' +
+          '<span class="req-id">' + esc(r.name) + '</span>' +
+          '<span class="pill ' + b[0] + '">' + b[1] + '</span>' + status + '</div>' +
+          '<p class="req-note">' + esc(r.note) + ' — ' +
+          (r.issuerUrl ? '<a href="' + esc(r.issuerUrl) + '" target="_blank" rel="noopener">' + esc(r.issuer) + ' ↗</a>' : esc(r.issuer)) +
+          '</p></article>';
+      }).join('');
+  }
+
   function render(report) {
     var rec = report.recommended;
     var stat = function (k, v) {
@@ -375,6 +440,7 @@
       stat('Requirements', String(rec.requirements.length)) +
       '</div>' +
       pathSection(rec, 'Recommended') +
+      positionSection(report.position) +
       report.alternatives.map(function (alt) {
         return '<details class="alt"><summary>Alternative: ' + esc(alt.path.kind) + '</summary>' +
           pathSection(alt, 'Alternative') + '</details>';
@@ -391,18 +457,53 @@
     main.innerHTML = html;
   }
 
+  var statedFromPosting = [];
+
+  function parsePosting() {
+    var btn = $('parse');
+    var hint = $('parse-hint');
+    btn.disabled = true;
+    hint.textContent = 'Reading…';
+    fetch('/v1/parse', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ text: $('posting').value })
+    })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok) { hint.textContent = res.j.error.message; return; }
+        var p = res.j.position;
+        if (p.jurisdiction) $('target').value = p.jurisdiction;
+        if (p.setting) $('setting').value = p.setting;
+        statedFromPosting = p.statedRequirements || [];
+        updateHint();
+        hint.textContent = 'Read as: ' + p.role +
+          (p.city ? ', ' + p.city : '') + (p.jurisdiction ? ', ' + p.jurisdiction.toUpperCase() : '') +
+          (p.setting ? ' (' + p.setting.replace('_', ' ') + ')' : '') +
+          ' · ' + statedFromPosting.length + ' stated requirement(s). Confirm the fields, then generate.';
+      })
+      .catch(function (err) { hint.textContent = 'Could not parse: ' + err.message; })
+      .then(function () { btn.disabled = false; });
+  }
+
   function generate() {
     var btn = $('go');
     btn.disabled = true;
     btn.textContent = 'Verifying…';
     var licensed = $('licensed').value.split(',').map(function (s) { return s.trim().toLowerCase(); }).filter(Boolean);
+    var certs = $('certs').value.split(',').map(function (s) { return s.trim().toLowerCase(); }).filter(Boolean);
     var body = {
-      position: { jurisdiction: $('target').value },
+      position: {
+        jurisdiction: $('target').value,
+        setting: $('setting').value || undefined,
+        statedRequirements: statedFromPosting
+      },
       profile: {
         licensedIn: licensed,
         homeState: $('home').value.trim().toLowerCase() || undefined,
         nptePassed: licensed.length > 0,
-        disciplineWithin2Years: $('discipline').checked
+        disciplineWithin2Years: $('discipline').checked,
+        certifications: certs
       }
     };
     fetch('/v1/reports', {
@@ -428,6 +529,7 @@
   }
 
   $('go').addEventListener('click', generate);
+  $('parse').addEventListener('click', parsePosting);
   loadJurisdictions().catch(function () {
     $('target-hint').textContent = 'Could not load jurisdictions — is the API running?';
   });
