@@ -366,7 +366,7 @@ Conflicts resolve upward: a Tier-1 source always beats lower tiers; conflicting 
 
 | Alternative | What it offers | Gap PT PracticePath fills |
 |-------------|----------------|---------------------------|
-| FSBPT licensure reference | Per-jurisdiction requirement summaries | Not position-specific; no wait times; no cost totals; no action sequencing |
+| FSBPT Jurisdiction Licensure Reference Guide | Per-jurisdiction requirement comparison tables (exam, CE, jurisprudence, foreign-educated) | Quarterly board self-report, not live-validated; stale topic PDFs (some dated 2010–2014) remain in circulation; not position-specific; no wait times; no cost totals; no action sequencing |
 | PT Compact site | Compact membership + privilege purchase | Only covers the compact path; assumes you already know it's your best path |
 | State board websites | Authoritative per-state detail | 53+ separate sites; navigation burden is the core problem |
 | APTA resources | Career/licensure guidance | General guidance, not a per-situation report |
@@ -415,7 +415,7 @@ MVP launches with the freemium consumer model; B2B follows once accuracy metrics
 | Risk | Impact | Mitigation |
 |------|--------|------------|
 | **Source volatility/breakage** — board sites restructure; extraction adapters break silently | Wrong or missing facts | Per-source adapters with extraction-confidence monitoring; canary sweeps; alert on extraction anomaly; fall back to stale-flagged data, never silent failure (FR-22) |
-| **Scraping/ToS constraints** — a board objects to automated access | Loss of a Tier-1 source | Robots compliance + identified user-agent + polite rates from day one (NFR-5); pursue official data relationships with FSBPT/boards; manual-verification fallback workflow |
+| **Scraping/ToS constraints & bot protection** — a board objects to automated access, or bot-protection blocks fetches. *Confirmed real during PRD research: fsbpt.org, ptcompact.org, apta.org, and several state board domains returned 403 to automated fetching.* | Loss of a Tier-1 source | Robots compliance + identified user-agent + polite rates from day one (NFR-5); pursue official data relationships with FSBPT/boards; residential-grade fetch infrastructure evaluated against ToS; evidence snapshots + manual-verification fallback workflow; treat this as a Phase-0 spike, not an assumption |
 | **LLM hallucination** in extraction or narrative | Trust-destroying inaccuracies | Narrative generation constrained to verified `Fact` records only; schema-constrained extraction with evidence snippets; confidence thresholds route ambiguity to human review; report-level audit sampling |
 | **Liability** — user acts on wrong info, suffers licensure delay/denial | Legal + reputational | NFR-8 disclaimers via counsel; citations to primary sources on every fact; accuracy incident process; E&O insurance |
 | **Wait-time data unavailable** for boards that don't publish it | Weakest link in the core promise | Tiered honesty: official published times where available; labeled estimates otherwise; community-reported actuals (P2) clearly separated from official data |
@@ -456,6 +456,91 @@ Recruiter workspaces, API access for staffing agencies, design-partner conversio
 
 ## 15. Appendix — Verified Domain Facts (Research Baseline)
 
-*This appendix grounds the PRD's examples in facts verified during PRD research. Product reports must re-verify all of this live — that is the product's core function. Verification dates as noted.*
+*This appendix grounds the PRD's examples in facts gathered via live web research on **July 3, 2026**. Product reports must re-verify all of this at request time — that is the product's core function, and this appendix will be stale by launch. Facts marked **[verify]** could not be confirmed against a live primary page during research (see §15.9) and must be re-confirmed before being seeded into the knowledge base.*
 
-<!-- RESEARCH APPENDIX: populated from live research -->
+### 15.1 National examination (NPTE) — FSBPT
+
+| Fact | Value | Source |
+|------|-------|--------|
+| Exam versions | NPTE-PT and NPTE-PTA; required by all US jurisdictions; administered at Prometric centers | https://www.fsbpt.org/Secondary-Pages/Exam-Candidates/National-Exam-NPTE |
+| Registration fee | $485 per attempt (PT and PTA) **[verify — secondary-corroborated]** | https://www.fsbpt.org/Our-Services/Candidate-Services/Exam-Registration-Payment |
+| Prometric test-center fee | ~$82–$112 additional (varies) | https://npte101.com/npte-exam-cost/ |
+| Exam calendar | Fixed dates, 4×/year per exam type (2026 PT: Jan 27–28, Apr 28–29, Jul 28–29, Oct 27–28) | https://www.fsbpt.org/Secondary-Pages/Exam-Candidates/National-Exam-NPTE/Dates-and-Deadlines |
+| Registration lead time | Register 8–10 weeks before test date; jurisdiction (state board) approval is a separate, board-controlled step with its own deadline (~4–5 weeks out) | https://www.fsbpt.org/Free-Resources/NPTE-Candidate-Handbook/Exam-Registration-and-Scheduling |
+| Score release | ~5 business days after exam | https://www.fsbpt.org/Secondary-Pages/Exam-Candidates/National-Exam-NPTE/After-Exam |
+| Retake limits | 6 lifetime attempts; max 3 per 12 months; two scores below 400 = permanent ineligibility; states may be stricter | https://www.fsbpt.org/Secondary-Pages/Exam-Candidates/National-Exam-NPTE/Retake-Exam/Important-Retake-Information |
+| Score transfer | $90 per receiving jurisdiction (+1.6% card fee); ~2 business days processing | https://www.fsbpt.org/Secondary-Pages/Licensees/Getting-Licensed/Score-Transfer-Service |
+| Other FSBPT services | ELDD (exam/license/discipline database used by boards); aPTitude (free CE tracking); Coursework Tools (CWT) for foreign-educated equivalency; Jurisdiction Licensure Reference Guide | https://www.fsbpt.org/Free-Resources |
+
+### 15.2 PT Compact
+
+| Fact | Value | Source |
+|------|-------|--------|
+| Mechanism | Home-state license in an active member state → purchase per-state "compact privilege" for remote member states; issuance typically within minutes; privilege expires with home-state license | https://ptcompact.org/process-and-requirements/ |
+| Membership (as reported 2026-04-29) | 37 jurisdictions active (incl. DC) **[verify roster — Nevada inferred as 37th]**; enacted-not-active: CT, ME, RI; introduced: IL, MA, MI; no legislation: CA, FL, HI, ID, MN, NM, NY, PR, USVI, WY | https://ptcompact.org/compact-map/ |
+| Fees | $45 Commission fee + remote-state fee $0–$300 per privilege (e.g., AZ/SC $45 total; TX +$50; WA +$45+$2; MS $195 total) | https://ptcompact.org/Compact-Privilege-Fee-Jurisprudence-and-Waiver-Table |
+| Jurisprudence for privileges | Some remote states require their jurisprudence exam before privilege issuance (e.g., AZ AZLAW, WA, TX JAM) | https://ptcompact.org/process-and-requirements/ |
+| Eligibility | Home-state residency (driver's license as proof; military exceptions); no license encumbrance; no discipline within prior 2 years | https://ptcompact.org/am-i-eligible/ |
+| Strategic significance | Privilege = minutes and ~$45–$345 vs. endorsement = 2–12+ weeks and ~$200–$500 — the core path-comparison the product automates (FR-11) | synthesis of above + §15.4 |
+
+### 15.3 State examples (deep-dive: CA, TX, FL, NY)
+
+| | California | Texas | Florida | New York |
+|---|---|---|---|---|
+| Board | PT Board of California (DCA) — ptbc.ca.gov | TX Board of PT Examiners (ECPTOTE) — ptot.texas.gov | FL Board of Physical Therapy (DOH) — floridasphysicaltherapy.gov | NYSED Office of the Professions — op.nysed.gov |
+| Initial fees | $300 application + $150 initial license **[verify split]** | ~$190 application **[verify — 22 TAC §651.2]** | $180 ($100 app + $75 license + $5) | $294 license + first registration; $70 limited permit |
+| Jurisprudence | CAL-JAM: online, 50 Q / 90 min, $50, 80% pass (since Jul 2024) | TX JAM: online open-book, 75 Q / 140 min, free initial / $48 renewal | FL Laws & Rules Exam: $65 (FSBPT-administered) | None |
+| Background check | DOJ/FBI: Live Scan in-state; $49 hard card out-of-state | IdentoGO fingerprints, $38.25 | Level 2 screening required since Jul 2025 (~$50–$90; $43.25 FDLE retention/renewal) | None published **[verify negative finding]** |
+| Endorsement | Same fees + CAL-JAM + all-state license verification | Online app + fingerprints + TX JAM + score transfer; temp license available | Endorsement (no reciprocity) + Laws & Rules exam; MOBILE Act path since Jul 2024 (fee ≤ $175) | Form 1 + $294 + Form 3 per prior state + Form 4 |
+| Processing time | 30 days to acknowledge + up to 45 days to issue (~6–11 wks in practice) | **1–4 days** once complete; may practice on online verification | 15-day initial review commitment | Not published; reputed slow |
+| CE / renewal | 30 hrs / 2 yrs (incl. 4 hrs BLS, 2 hrs ethics/laws) | 30 CCUs / 2 yrs (incl. TX JAM + human-trafficking course); renewal ~$248 **[verify]** | 24 hrs / 2-yr biennium (incl. 2 hrs medical errors) | 36 hrs / 3 yrs; $224 triennial registration |
+| PT Compact | Not a member | Active member since Jan 2019 (privilege +$50) | Not a member (MOBILE Act as alternative) | Not a member |
+
+Sources: ptbc.ca.gov (fees, CAL-JAM, endorsement, processing, CE pages); ptot.texas.gov (apply-by-exam/endorsement, pt-jam, compact, processing FAQ); floridasphysicaltherapy.gov (application PDF, laws-and-rules exam, licensing-renewals) + flhealthsource.gov (screening); op.nysed.gov (license-requirements, application forms, CE FAQs). All accessed/indexed 2026-07-03.
+
+### 15.4 Cross-state variation (drives the data model)
+
+- **Jurisprudence exams:** ~30 jurisdictions require one **[verify current count]**; formats range from FSBPT-run online JAM modules to state-run exams; fees $0–$65 (https://www.fsbpt.org/lrg; https://www.fsbpt.org/Our-Services/Jurisprudence-Assessment-Module-JAM-Services)
+- **Initial state fees:** ~$100 (CO, IN) to $294 (NY) / $450 combined (CA) — plus the uniform $485 NPTE + Prometric fee (https://triagestaff.com/pt-pta-licensure-applications-fees-by-state/; board pages above)
+- **Processing/wait times:** 1–4 days (TX) → 15-day review (FL) → ~6–11 weeks (CA) → unpublished (NY); national range ~1–8+ weeks; compact privileges near-instant (board pages above; https://trailsofatravelpt.com/licensing-time-frame/; https://www.coremedicalgroup.com/traveler-tools/resources/pt-licensure/)
+- **Renewal cycles:** annual (WA, $100/yr) / biennial (CA, TX, FL) / triennial (NY); CE 20–36 hrs per cycle with state-mandated topics (BLS, ethics, medical errors, human trafficking, HIV/AIDS) varying by state
+- **Supervised practice (mainly foreign-educated):** CA 9-month supervised clinical service; KY 3 months; LA provisional license (https://www.ptbc.ca.gov/applicants/foreign_pt/clinical.shtml; 201 KAR 22:070; https://www.laptboard.org/page/Initial-Examination-Foreign-Grad)
+- **Recent-change evidence (why per-request validation matters):** CAL-JAM replaced the CA law exam Jul 2024; FL MOBILE Act endorsement path Jul 2024; FL Level 2 screening mandate Jul 2025; TX new licensing system Mar 2025 — four material changes in four researched states within ~24 months
+
+### 15.5 Foreign-educated path
+
+- Credential evaluation: FCCPT Type 1/Comprehensive review (also serves as the immigration Healthcare Worker Certificate); processing ≈ 23–25 weeks; fee ~$900–$1,000 **[verify current — last confirmed schedule $890 (2018)]** (https://www.fccpt.org/; https://www.fccpt.org/Requirements/How-to-Apply/Application-Fee-Schedule)
+- Equivalency instrument: FSBPT Coursework Tool (CWT), version keyed to graduation year; some states designate additional evaluators (https://www.fsbpt.org/Free-Resources/Foreign-Educated-PTs-and-PT-Assistants)
+- English proficiency: TOEFL iBT with state minimums (model rule: Writing 22 / Speaking 24 / Reading 22 / Listening 21); exemptions for US/UK/IE/AU/NZ/CA-except-Quebec degrees; scores valid 5 years at FCCPT (https://www.fsbpt.org/lrg/Home/EnglishLanguageRequirement; https://www.fccpt.org/Requirements/How-to-Apply/TOEFL-Requirements)
+- Net effect vs. US-educated: roughly +6–12 months and +$1,200–$2,500 before state fees and NPTE (synthesized from components above)
+
+### 15.6 Position-level requirements (beyond the license)
+
+- **BLS/CPR:** near-universal employer requirement; AHA and Red Cross dominant (many systems AHA-only); 2-year validity; ~$34–36 AHA online portion + $45–$100 skills session (blended total commonly ~$120); obtainable same-day-to-days (https://cpr.heart.org/en/courses/basic-life-support-course-options; https://shopcpr.heart.org/courses/bls)
+- **ABPTS specialist certifications** — 10 areas: Cardiovascular & Pulmonary (CCS), Clinical Electrophysiology (ECS), Geriatrics (GCS), Neurology (NCS), Oncology, Orthopaedics (OCS), Pediatrics (PCS), Sports (SCS), Pelvic & Women's Health (WCS), Wound Management. 2026 fees: application $535 member / $880 non-member; exam $810 / $1,535 (member total ≈ $1,345). Annual application cycle with fall/spring exam windows by specialty group; valid 10 years **[verify fees at build time]** (https://specialization.apta.org/become-a-specialist/fees-deadlines; https://www.apta.org/your-career/career-advancement/specialist-certification)
+- **Home health:** driver's license + vehicle + auto insurance; current TB screening (skin test, IGRA, or chest X-ray); criminal background check + HHS-OIG LEIE exclusion screening (pre-hire and recurring, per Medicare participation rules); state fingerprint checks under the National Background Check Program in participating states (https://oig.hhs.gov/oei/reports/oei-07-14-00131.pdf)
+- **School-based/pediatrics:** some states require a separate school credential on top of the PT license — e.g., WA ESA School Physical Therapist certificate; NJ School Physical Therapist Standard Certificate; PA requires child-abuse-recognition training for licensure + the PA clearance set (child abuse history, state police, FBI) for work with children (https://ospi.k12.wa.us/certification/...school-physical-therapist-first-time; https://www.nj.gov/education/certification/edsrvs/endorsementsedsrvs/2920S.shtml; https://www.pa.gov/agencies/dhs/resources/keep-kids-safe/child-abuse-clearances)
+- **Billing/administrative:** NPI Type 1 — free, 1–10 business days online (https://nppes.cms.hhs.gov); Medicare enrollment (PECOS/CMS-855I) applies to PTs in private practice, ~60-day processing — facility-based PTs bill under the facility (https://medicare.fcso.com/enrollment/physical-therapist-pt-private-practice)
+- **Cross-setting onboarding norms:** pre-employment drug screen; immunization set (Hep B series — OSHA-mandated employer offer, MMR, varicella, Tdap, annual flu) + TB + physical; professional liability insurance $1M/$3M typically $100–$400/yr (effectively required for private practice/contract/travel; usually employer-covered for employees) (https://www.osha.gov/publications/bbfact05; https://www.hpso.com/Insurance-for-you/Individual-Practitioners/Physical-Therapists)
+- **Direct access:** all 50 states + DC + USVI have some form; APTA classifies 21 states unrestricted, 29 + DC + USVI provisional (limits/conditions) — affects scope and referral workflow in outpatient roles (https://www.apta.org/advocacy/issues/direct-access-advocacy/direct-access-by-state, per 2025 APTA report **[verify]**)
+- **Requirement tiering confirmed by the evidence** (adopted in FR-12): (a) legally required to practice; (b) payer/regulator-required for the setting (NPI, PECOS, OIG screening, TB/immunizations per state law); (c) employer-required (BLS, drug screen, driver's license); (d) preferred/differentiator (ABPTS certs, liability insurance for employees)
+
+### 15.7 Competitive landscape sources
+
+- FSBPT Jurisdiction Licensure Reference Guide — quarterly board self-report; stale topic PDFs from 2010–2014 still circulating (https://www.fsbpt.org/Free-Resources/Regulatory-Resources/Licensure-Reference-Guide)
+- PT Compact site — compact path only (https://ptcompact.org/)
+- APTA licensure hub & direct-access PDFs — static, annual-or-worse snapshots; multiple dated versions live simultaneously (https://www.apta.org/your-practice/licensure)
+- Staffing-agency/travel guides — TravelTherapyLicensure.com, CoreMedical (processing timeframes), Triage (fees by state), Trusted Health, Vivian, Trails of a Travel PT — readable but unverified, no position tailoring
+- B2B credentialing platforms — Medallion, Verifiable, CertifyOS, MedTrainer — employer/payer-facing; none clinician-facing, none parses a posting into a requirements checklist
+- **Gap confirmed:** no product does per-request-validated, position-specific, cost-and-timeline-complete reports for practitioners (§10.1)
+
+### 15.8 Market context
+
+- Licensed workforce (FSBPT 2025 census, data as of Dec 2024): **322,992 PTs and 134,457 PTAs** with ≥1 active US license — up from 238,256 / 111,317 in 2021 (https://www.fsbpt.org/Portals/0/documents/2025%20for%20FSBPT%20Census%20of%20Licensed%20PTs%20and%20PTAs%20in%20the%20USA.pdf)
+- BLS projections 2024–2034: PT employment +11% (~13,200 openings/yr), median pay $101,020 (May 2024); PTA +16%, median $65,510 (https://www.bls.gov/ooh/healthcare/physical-therapists.htm)
+- Allied healthcare staffing market ~$8.8B (2025) → ~$9.3B (2026), ~5.8% CAGR; ~60% of hospitals use temporary allied professionals (https://www.grandviewresearch.com/industry-analysis/healthcare-staffing-market; https://www.staffingindustry.com/editorial/healthcare-staffing-report/healthcare-staffing-to-stabilize-in-2025-see-modest-improvement-in-2026)
+
+### 15.9 Research method caveats
+
+- All facts verified via live web search on 2026-07-03. Direct automated fetches to fsbpt.org, ptcompact.org, apta.org, specialization.apta.org, and several state board domains were **blocked (HTTP 403) by bot protection** during research; those facts were extracted from search-indexed content of the cited primary pages plus current secondary corroboration. This finding is itself product-relevant and is reflected in §12 (fetch-infrastructure risk) and Open Question #1 (official data partnerships).
+- Items marked **[verify]** must be re-confirmed against live primary sources during Phase 0 KB seeding before being served to users.
