@@ -1,0 +1,9 @@
+node_modules
+census
+data/seeds
+data/evidence
+data/reports
+data/report-*.md
+test
+*.md
+!data/golden/README.md

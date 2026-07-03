@@ -22,19 +22,14 @@ import { NotAPtPositionError, parsePositionText, parsePositionUrl, type Messages
 import { FetchBlockedError } from '../seeding/fetcher.js';
 import type { PracticeSetting } from '../position/types.js';
 import { GoldenFactStore, type FactStore } from './facts.js';
-
-interface StoredReport {
-  id: string;
-  jurisdiction: string;
-  profile: TherapistProfile;
-  position?: PositionContext;
-  report: Report;
-}
+import { FileReportStore, MemoryReportStore, type ReportStore } from './store.js';
 
 export interface ApiOptions {
   factStore?: FactStore;
   /** Injectable LLM client for /v1/parse Modes A/B (tests use a stub). */
   parseClient?: MessagesClient;
+  /** Report persistence; defaults to in-memory. Deployments use FileReportStore. */
+  reportStore?: ReportStore;
 }
 
 function llmCredentialsPresent(): boolean {
@@ -84,7 +79,7 @@ export function createApiServer(options: FactStore | ApiOptions = {}): Server {
   // Back-compat: a bare FactStore may be passed directly.
   const opts: ApiOptions = 'factsFor' in options ? { factStore: options } : options;
   const factStore = opts.factStore ?? new GoldenFactStore();
-  const reports = new Map<string, StoredReport>();
+  const reports = opts.reportStore ?? new MemoryReportStore();
 
   async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const url = new URL(req.url ?? '/', 'http://localhost');
@@ -190,14 +185,14 @@ export function createApiServer(options: FactStore | ApiOptions = {}): Server {
       const facts = await factStore.factsFor(jurisdiction);
       const report = assembleReport(jurisdiction, profile, facts, new Date(), positionContext);
       const id = randomUUID();
-      reports.set(id, { id, jurisdiction, profile, position: positionContext, report });
+      await reports.put({ id, jurisdiction, profile, position: positionContext, report });
       sendJson(res, 201, { id, report });
       return;
     }
 
     const reportMatch = url.pathname.match(/^\/v1\/reports\/([0-9a-f-]{36})(\/reverify)?$/);
     if (reportMatch) {
-      const stored = reports.get(reportMatch[1]!);
+      const stored = await reports.get(reportMatch[1]!);
       if (!stored) {
         sendError(res, 404, 'not_found', 'No such report');
         return;
@@ -209,6 +204,7 @@ export function createApiServer(options: FactStore | ApiOptions = {}): Server {
       if (req.method === 'POST' && reportMatch[2]) {
         const facts = await factStore.factsFor(stored.jurisdiction);
         stored.report = assembleReport(stored.jurisdiction, stored.profile, facts, new Date(), stored.position);
+        await reports.put(stored);
         sendJson(res, 200, { id: stored.id, report: stored.report });
         return;
       }
@@ -236,7 +232,7 @@ export function createApiServer(options: FactStore | ApiOptions = {}): Server {
 const invokedDirectly = process.argv[1]?.endsWith('server.ts') || process.argv[1]?.endsWith('server.js');
 if (invokedDirectly) {
   const port = Number(process.argv[2] ?? process.env.PORT ?? 3000);
-  createApiServer().listen(port, () => {
-    console.log(`PT PracticePath API listening on :${port}`);
+  createApiServer({ reportStore: new FileReportStore() }).listen(port, () => {
+    console.log(`PT PracticePath API listening on :${port} (reports persisted to data/reports/)`);
   });
 }

@@ -50,6 +50,20 @@ human approves it; blocked sources are skipped and named, not silently dropped
 production-realistic egress. Runs from sandboxes/datacenter proxies overstate
 blocking; the report header records the environment via `CENSUS_ENV`.
 
+## Deploy
+
+```sh
+docker build -t pt-practicepath .
+docker run -p 3000:3000 -e ANTHROPIC_API_KEY=sk-ant-... -v ptpp-data:/app/data pt-practicepath
+```
+
+Reports persist to `data/reports/` (mount `/app/data`). Then follow
+[docs/OPS.md](docs/OPS.md) — the ordered runbook for the production census,
+seeding + audit against the golden set, conflict resolution, and wiring live
+facts into reports. Partnership outreach drafts: [docs/outreach/](docs/outreach/).
+To split this into its own repository: create an empty repo in the GitHub UI,
+then `./scripts/export-standalone.sh <remote-url>`.
+
 ## Phase 0 remaining work
 
 - [x] Locate fee/application/processing-time pages for the 49 backlog jurisdictions (census enumeration — see `src/sources/boards.ts`)
