@@ -9,12 +9,16 @@ Free Resources / Licensure Reference Guide team)
 
 Hello,
 
-I'm building PT PracticePath, a tool that helps physical therapists and PTAs
-understand everything required to practice in a given position and state —
-licensure path comparison (examination, endorsement, compact privilege),
-per-requirement costs and current processing times, and setting-specific
-requirements — with every fact cited to its official source and stamped with
-when it was verified.
+I'm preparing to launch PT PracticePath as a beta for physical therapists
+and PTAs. It helps them understand everything required to practice in a
+given position and state — licensure path comparison (examination,
+endorsement, compact privilege), per-requirement costs and current
+processing times, and setting-specific requirements — with every fact cited
+to its official source and stamped with when it was verified.
+
+We're reaching out before the beta opens because accuracy is the product's
+entire premise, and we'd rather build on a supported data channel from day
+one than scrape around one.
 
 FSBPT's resources are the authoritative national layer of that picture: the
 NPTE (fees, fixed dates, registration and jurisdiction-approval flow), the
