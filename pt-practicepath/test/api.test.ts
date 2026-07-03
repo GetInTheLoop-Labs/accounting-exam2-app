@@ -23,6 +23,18 @@ async function post(path: string, body: unknown): Promise<{ status: number; json
   return { status: res.status, json: await res.json() };
 }
 
+describe('GET /', () => {
+  it('serves the web UI', async () => {
+    const res = await fetch(`${base}/`);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain('text/html');
+    const html = await res.text();
+    expect(html).toContain('PracticePath');
+    expect(html).toContain('/v1/reports'); // UI talks to the API
+    expect(html).toContain('data-theme'); // both themes wired
+  });
+});
+
 describe('GET /v1/jurisdictions', () => {
   it('returns the coverage map with compact status', async () => {
     const res = await fetch(`${base}/v1/jurisdictions`);

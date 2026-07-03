@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PT PracticePath — Practice Requirements Navigator</title>
+<style>
+  /* ── Tokens ─────────────────────────────────────────────────────── */
+  :root {
+    --paper: #f6f8f7;
+    --card: #ffffff;
+    --ink: #182528;
+    --muted: #56676c;
+    --line: #dde5e2;
+    --accent: #0e7268;
+    --accent-ink: #ffffff;
+    --accent-soft: #e2efec;
+    --good: #1b7a44;
+    --good-soft: #e3f2e8;
+    --warn: #a8650b;
+    --warn-soft: #f7edda;
+    --critical: #b3261e;
+    --critical-soft: #f9e5e3;
+    --rail: #eef3f1;
+    --focus: #0e7268;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0d1517;
+      --card: #142022;
+      --ink: #e4edea;
+      --muted: #93a6a3;
+      --line: #243432;
+      --accent: #3fbfb2;
+      --accent-ink: #06201d;
+      --accent-soft: #123832;
+      --good: #58c584;
+      --good-soft: #12301e;
+      --warn: #e2a94e;
+      --warn-soft: #33270e;
+      --critical: #ef8078;
+      --critical-soft: #3a1512;
+      --rail: #101b1d;
+      --focus: #3fbfb2;
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #f6f8f7; --card: #ffffff; --ink: #182528; --muted: #56676c;
+    --line: #dde5e2; --accent: #0e7268; --accent-ink: #ffffff; --accent-soft: #e2efec;
+    --good: #1b7a44; --good-soft: #e3f2e8; --warn: #a8650b; --warn-soft: #f7edda;
+    --critical: #b3261e; --critical-soft: #f9e5e3; --rail: #eef3f1; --focus: #0e7268;
+  }
+  :root[data-theme="dark"] {
+    --paper: #0d1517; --card: #142022; --ink: #e4edea; --muted: #93a6a3;
+    --line: #243432; --accent: #3fbfb2; --accent-ink: #06201d; --accent-soft: #123832;
+    --good: #58c584; --good-soft: #12301e; --warn: #e2a94e; --warn-soft: #33270e;
+    --critical: #ef8078; --critical-soft: #3a1512; --rail: #101b1d; --focus: #3fbfb2;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  /* ── Shell ──────────────────────────────────────────────────────── */
+  .shell { display: grid; grid-template-columns: 320px 1fr; min-height: 100vh; }
+  @media (max-width: 880px) { .shell { grid-template-columns: 1fr; } }
+
+  /* ── Rail (request composer) ────────────────────────────────────── */
+  .rail {
+    background: var(--rail);
+    border-right: 1px solid var(--line);
+    padding: 28px 24px;
+    display: flex; flex-direction: column; gap: 22px;
+  }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand .mark {
+    font-family: var(--mono);
+    font-weight: 700; font-size: 13px; letter-spacing: 0.08em;
+    color: var(--accent-ink); background: var(--accent);
+    padding: 4px 7px; border-radius: 4px;
+  }
+  .brand h1 { font-size: 17px; font-weight: 650; margin: 0; letter-spacing: -0.01em; }
+  .brand-sub { font-size: 12.5px; color: var(--muted); margin: -14px 0 0; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 11px; font-weight: 650; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .field select, .field input[type="text"] {
+    font: inherit; color: var(--ink);
+    background: var(--card); border: 1px solid var(--line); border-radius: 6px;
+    padding: 8px 10px;
+  }
+  .field .hint { font-size: 12px; color: var(--muted); }
+  .check { display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; }
+  .check input { margin-top: 3px; accent-color: var(--accent); }
+
+  .go {
+    font: inherit; font-weight: 650;
+    background: var(--accent); color: var(--accent-ink);
+    border: 0; border-radius: 7px; padding: 11px 14px; cursor: pointer;
+  }
+  .go:hover { filter: brightness(1.06); }
+  .go[disabled] { opacity: 0.55; cursor: wait; }
+  .rail-note { font-size: 12px; color: var(--muted); margin-top: auto; }
+
+  /* ── Main pane ──────────────────────────────────────────────────── */
+  .main { padding: 30px 36px 60px; max-width: 980px; }
+  .empty { color: var(--muted); max-width: 46ch; margin-top: 8vh; }
+  .empty h2 { font-weight: 650; letter-spacing: -0.01em; color: var(--ink); }
+
+  /* Summary band */
+  .summary {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1px; background: var(--line);
+    border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+    margin-bottom: 26px;
+  }
+  .stat { background: var(--card); padding: 14px 16px; }
+  .stat .k {
+    font-size: 11px; font-weight: 650; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px;
+  }
+  .stat .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 19px; font-weight: 600; }
+  .stat .v small { font-size: 12px; color: var(--muted); font-family: var(--sans); font-weight: 500; }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11.5px; font-weight: 650; letter-spacing: 0.02em;
+    border-radius: 999px; padding: 2.5px 9px; white-space: nowrap;
+  }
+  .pill.verified { background: var(--good-soft); color: var(--good); }
+  .pill.stale { background: var(--warn-soft); color: var(--warn); }
+  .pill.blocked { background: var(--critical-soft); color: var(--critical); }
+  .pill.kind { background: var(--accent-soft); color: var(--accent); font-family: var(--mono); text-transform: uppercase; }
+  .pill.dep { background: transparent; color: var(--muted); border: 1px dashed var(--line); }
+
+  h2.path-head {
+    font-size: 15px; font-weight: 650; letter-spacing: 0.01em;
+    display: flex; align-items: center; gap: 10px; margin: 30px 0 4px;
+  }
+  .path-meta { font-size: 13px; color: var(--muted); margin: 0 0 14px; }
+  .path-meta .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); }
+
+  /* Requirement cards */
+  .req {
+    background: var(--card); border: 1px solid var(--line); border-radius: 9px;
+    padding: 13px 16px; margin-bottom: 10px; position: relative;
+  }
+  .req.critical { border-left: 3px solid var(--accent); }
+  .req-head { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+  .req-id { font-family: var(--mono); font-size: 13px; font-weight: 650; }
+  .req-note { font-size: 12.5px; color: var(--muted); margin: 4px 0 0; }
+  .facts { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .fact {
+    display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap;
+    font-size: 13.5px; border-top: 1px solid var(--line); padding-top: 7px;
+  }
+  .fact .cls {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted); min-width: 74px;
+  }
+  .fact .val { font-variant-numeric: tabular-nums; }
+  .fact .val.money { font-family: var(--mono); font-weight: 650; }
+  .fact .src { font-size: 12px; margin-left: auto; white-space: nowrap; }
+  .nofacts { font-size: 13px; color: var(--muted); font-style: italic; margin: 10px 0 0; padding-top: 7px; border-top: 1px dashed var(--line); }
+
+  /* Timeline strip */
+  .plan { margin: 14px 0 6px; }
+  .plan-bar { display: flex; gap: 3px; align-items: stretch; }
+  .plan-seg {
+    flex: 1 1 0; min-width: 60px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 6px;
+    padding: 7px 9px; font-size: 11.5px;
+  }
+  .plan-seg.critical { border-color: var(--accent); background: var(--accent-soft); }
+  .plan-seg .sid { font-family: var(--mono); font-weight: 650; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .plan-seg .sdays { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  details.alt { margin-top: 18px; }
+  details.alt > summary {
+    cursor: pointer; font-weight: 650; font-size: 14px;
+    padding: 10px 0; border-top: 1px solid var(--line); list-style: none;
+  }
+  details.alt > summary::before { content: "▸ "; color: var(--muted); }
+  details.alt[open] > summary::before { content: "▾ "; }
+
+  .blocked-list { margin: 26px 0 0; padding: 14px 16px; background: var(--card); border: 1px dashed var(--line); border-radius: 9px; }
+  .blocked-list h3 { margin: 0 0 8px; font-size: 12px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+  .blocked-list p { margin: 4px 0; font-size: 13.5px; }
+
+  .disclaimer { margin-top: 34px; font-size: 12px; color: var(--muted); max-width: 72ch; border-top: 1px solid var(--line); padding-top: 12px; }
+  .gen-meta { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+  .banner {
+    border: 1px solid var(--warn); background: var(--warn-soft); color: var(--warn);
+    font-size: 13px; border-radius: 8px; padding: 9px 13px; margin-bottom: 18px;
+  }
+  .error-box {
+    border: 1px solid var(--critical); background: var(--critical-soft); color: var(--critical);
+    font-size: 13.5px; border-radius: 8px; padding: 10px 14px; margin-bottom: 18px;
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="rail" aria-label="Report request">
+    <div class="brand">
+      <span class="mark">PT·PP</span>
+      <h1>PracticePath</h1>
+    </div>
+    <p class="brand-sub">Practice requirements, verified per request.</p>
+
+    <div class="field">
+      <label for="target">Target jurisdiction</label>
+      <select id="target"></select>
+      <span class="hint" id="target-hint"></span>
+    </div>
+
+    <div class="field">
+      <label for="licensed">Licensed in (codes, comma-sep)</label>
+      <input type="text" id="licensed" placeholder="e.g. tx, oh — blank if new grad" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label for="home">Home state (residence)</label>
+      <input type="text" id="home" placeholder="e.g. tx" autocomplete="off">
+    </div>
+
+    <label class="check">
+      <input type="checkbox" id="discipline">
+      <span>Disciplinary action against any license within the last 2 years</span>
+    </label>
+
+    <button class="go" id="go">Generate report</button>
+
+    <p class="rail-note">Facts come from the knowledge base and are re-verified
+    against state boards, FSBPT, and the PT Compact Commission. Anything that
+    could not be re-verified is flagged — never silently served as current.</p>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="empty" id="empty">
+      <h2>Where do you want to practice?</h2>
+      <p>Pick a target jurisdiction and describe your current licensure.
+      You'll get every requirement to practice there — where to get it, how
+      long it takes, and what it costs — with a recommended path and the
+      critical path highlighted.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var main = $('main');
+  var jurisdictions = [];
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function money(n) { return '$' + n.toFixed(2).replace(/\.00$/, ''); }
+
+  function loadJurisdictions() {
+    return fetch('/v1/jurisdictions')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        jurisdictions = data.jurisdictions;
+        var sel = $('target');
+        sel.innerHTML = jurisdictions
+          .slice()
+          .sort(function (a, b) { return a.name < b.name ? -1 : 1; })
+          .map(function (j) {
+            var badge = j.compact.active ? ' · compact' : '';
+            return '<option value="' + j.id + '">' + esc(j.name) + badge + '</option>';
+          })
+          .join('');
+        sel.addEventListener('change', updateHint);
+        updateHint();
+      });
+  }
+
+  function updateHint() {
+    var j = jurisdictions.find(function (x) { return x.id === $('target').value; });
+    if (!j) return;
+    $('target-hint').textContent = j.compact.active
+      ? 'Active PT Compact member — a privilege may replace a full license.'
+      : (j.compact.member ? 'Compact enacted but not yet issuing privileges.' : 'Not a PT Compact member — endorsement or examination.');
+  }
+
+  function freshnessPill(f) {
+    if (f.presentation === 'verified') {
+      return '<span class="pill verified">✓ verified ' + esc(f.verifiedAt.slice(0, 10)) + '</span>';
+    }
+    return '<span class="pill stale">⚠ last confirmed ' + esc(f.verifiedAt.slice(0, 10)) + '</span>';
+  }
+
+  function factRow(f) {
+    var val = f.factClass === 'fee'
+      ? '<span class="val money">' + money(Number(f.value)) + '</span>'
+      : '<span class="val">' + esc(f.value) + '</span>';
+    return '<li class="fact"><span class="cls">' + esc(f.factClass) + '</span>' + val +
+      freshnessPill(f) +
+      '<a class="src" href="' + esc(f.sourceUrl) + '" target="_blank" rel="noopener">source ↗</a></li>';
+  }
+
+  function reqCard(req, plan) {
+    var critical = plan.criticalPath.indexOf(req.requirementId) >= 0;
+    var dep = req.applicability === 'jurisdiction_dependent'
+      ? '<span class="pill dep">if required by state</span>' : '';
+    var facts = req.facts.length
+      ? '<ul class="facts">' + req.facts.map(factRow).join('') + '</ul>'
+      : '<p class="nofacts">No verified facts yet — resolved live at report time.</p>';
+    return '<article class="req' + (critical ? ' critical' : '') + '">' +
+      '<div class="req-head"><span class="req-id">' + esc(req.requirementId) + '</span>' + dep +
+      (critical ? '<span class="pill kind">critical path</span>' : '') + '</div>' +
+      (req.note ? '<p class="req-note">' + esc(req.note) + '</p>' : '') +
+      facts + '</article>';
+  }
+
+  function planStrip(plan) {
+    return '<div class="plan"><div class="plan-bar">' +
+      plan.steps.map(function (s) {
+        var days = s.minDays === s.maxDays ? s.maxDays + 'd' : s.minDays + '–' + s.maxDays + 'd';
+        return '<div class="plan-seg' + (s.onCriticalPath ? ' critical' : '') + '" title="' + esc(s.id) + '">' +
+          '<span class="sid">' + esc(s.id) + '</span>' +
+          '<span class="sdays">' + days + (s.estimated ? ' est.' : '') + '</span></div>';
+      }).join('') + '</div></div>';
+  }
+
+  function pathSection(pr, heading) {
+    var cost = money(pr.cost.knownUsd) +
+      (pr.cost.staleUsd > 0 ? ' <small>(' + money(pr.cost.staleUsd) + ' stale ⚠)</small>' : '');
+    var unknown = pr.cost.requirementsWithUnknownCost.length;
+    return '<h2 class="path-head">' + esc(heading) +
+      ' <span class="pill kind">' + esc(pr.path.kind) + '</span></h2>' +
+      '<p class="path-meta">Known cost <span class="mono">' + cost + '</span>' +
+      (unknown ? ' + ' + unknown + ' requirement(s) with unknown cost' : '') +
+      ' · Timeline <span class="mono">' + pr.plan.totalMinDays + '–' + pr.plan.totalMaxDays + ' days</span>' +
+      (pr.plan.containsEstimates ? ' (contains estimates)' : '') + '</p>' +
+      planStrip(pr.plan) +
+      pr.requirements.map(function (r) { return reqCard(r, pr.plan); }).join('');
+  }
+
+  function render(report) {
+    var rec = report.recommended;
+    var stat = function (k, v) {
+      return '<div class="stat"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>';
+    };
+    var html =
+      (report.containsUnverifiedData
+        ? '<div class="banner">Some facts could not be re-verified this request or are estimates — each is flagged inline.</div>'
+        : '') +
+      '<div class="summary">' +
+      stat('Recommended path', '<span class="pill kind">' + esc(rec.path.kind) + '</span>') +
+      stat('Known cost', money(rec.cost.knownUsd) +
+        (rec.cost.requirementsWithUnknownCost.length ? ' <small>+' + rec.cost.requirementsWithUnknownCost.length + ' unknown</small>' : '')) +
+      stat('Timeline', rec.plan.totalMinDays + '–' + rec.plan.totalMaxDays + ' <small>days</small>') +
+      stat('Requirements', String(rec.requirements.length)) +
+      '</div>' +
+      pathSection(rec, 'Recommended') +
+      report.alternatives.map(function (alt) {
+        return '<details class="alt"><summary>Alternative: ' + esc(alt.path.kind) + '</summary>' +
+          pathSection(alt, 'Alternative') + '</details>';
+      }).join('') +
+      (report.blocked.length
+        ? '<div class="blocked-list"><h3>Not available</h3>' +
+          report.blocked.map(function (b) {
+            return '<p><span class="pill blocked">' + esc(b.kind) + '</span> ' + esc(b.blockedBecause) + '</p>';
+          }).join('') + '</div>'
+        : '') +
+      '<p class="disclaimer">This report is informational and not legal advice. Requirements are set by ' +
+      'state licensing boards; confirm with the board before acting. Every fact links to its official source.</p>' +
+      '<p class="gen-meta">generated ' + esc(report.generatedAt) + ' · jurisdiction ' + esc(report.jurisdiction) + '</p>';
+    main.innerHTML = html;
+  }
+
+  function generate() {
+    var btn = $('go');
+    btn.disabled = true;
+    btn.textContent = 'Verifying…';
+    var licensed = $('licensed').value.split(',').map(function (s) { return s.trim().toLowerCase(); }).filter(Boolean);
+    var body = {
+      position: { jurisdiction: $('target').value },
+      profile: {
+        licensedIn: licensed,
+        homeState: $('home').value.trim().toLowerCase() || undefined,
+        nptePassed: licensed.length > 0,
+        disciplineWithin2Years: $('discipline').checked
+      }
+    };
+    fetch('/v1/reports', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body)
+    })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok) {
+          main.innerHTML = '<div class="error-box">' + esc(res.j.error.message) + '</div>';
+          return;
+        }
+        render(res.j.report);
+      })
+      .catch(function (err) {
+        main.innerHTML = '<div class="error-box">Could not reach the API: ' + esc(err.message) + '</div>';
+      })
+      .then(function () {
+        btn.disabled = false;
+        btn.textContent = 'Generate report';
+      });
+  }
+
+  $('go').addEventListener('click', generate);
+  loadJurisdictions().catch(function () {
+    $('target-hint').textContent = 'Could not load jurisdictions — is the API running?';
+  });
+})();
+</script>
+</body>
+</html>
