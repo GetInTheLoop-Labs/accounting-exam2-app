@@ -350,7 +350,31 @@ Conflicts resolve upward: a Tier-1 source always beats lower tiers; conflicting 
 - **Slow-moving classes** (statutory requirements, CE rules, compact membership): 30-day background sweeps + event monitoring (compact commission announcements, board news pages).
 - **Background sweeps** run on freshness schedules independent of user traffic, so most user requests hit fresh facts and live verification concentrates on the truly volatile classes (keeps NFR-3 latency achievable).
 
-### 9.3 Trust presentation & legal posture
+### 9.3 Source access strategy
+
+A defining constraint, confirmed during PRD research: several Tier-1 domains (fsbpt.org, ptcompact.org, apta.org, some state boards) block automated fetching. The strategy below turns that from an open risk into a managed, per-source engineering program.
+
+**Framing principle.** "Validated on every request" does not require "fetched from the source on every request." The architecture (§8.3) separates *verification* (background, via whatever channel works per source) from *serving* (facts with verified-at timestamps governed by freshness windows). Reliable **periodic** access to every source is the true requirement; **real-time** access is needed only for the live-only fact class (published processing times) — which exists only where boards publish it at all.
+
+**9.3.1 Source access census (Phase 0 spike).** Enumerate the full source universe (~53 jurisdiction boards + FSBPT, PT Compact Commission, ABPTS/APTA, AHA, CMS/NPPES, FCCPT — est. 70–100 domains, each with specific fact-bearing pages) into the Source Registry. Probe every source from production-realistic infrastructure — plain fetch with an honest identified user-agent, then headless rendering — recording robots.txt policy, bot-protection behavior, page format (HTML/PDF/portal), and update frequency. *Caveat from research:* the 403s observed during PRD research came through a research-sandbox egress proxy, a known-bad bot signal; the census must measure from production-like infrastructure, not extrapolate from that result. **Output:** an access matrix classifying every source, converting an unknown risk into a per-source task list.
+
+**9.3.2 Escalation ladder.** Each source is assigned the cheapest rung that works, recorded in the Source Registry and re-evaluated quarterly:
+
+| Rung | Channel | Notes |
+|------|---------|-------|
+| A | Official data access / partnership | FSBPT (LRG, ELDD, data services) and the PT Compact Commission alone cover the national layer; boards are public agencies, some with open data or structured-request processes |
+| B | Alternative authoritative channels for the same fact | Fees/requirements are set in statute and administrative code hosted on legislature/SOS sites — stable, rarely bot-protected, arguably more authoritative than board pages. Board newsletters/GovDelivery/RSS provide change *notifications* without scraping |
+| C | Direct polite fetching | Robots-compliant, identified UA with contact email, per-domain rate limits, aggressive caching; headless rendering where required |
+| D | Licensed third-party access | Compliant fetch vendors, search-index APIs — for the stubborn middle |
+| E | Human-in-the-loop verification ops | Scheduled manual confirmation queue (boards answer email/phone). Slow-moving fact classes need only 30-day sweeps, so a small ops effort covers the blocked tail; manually verified facts still get timestamps and evidence snapshots |
+
+**9.3.3 Partnership track (starts day one).** FSBPT and Compact Commission outreach has long lead time, so it runs in parallel from Phase 0 — not after scraping fails. Pitch: the product cites them, routes users to them, reduces misinformation about their own processes, and cuts automated load on their sites. Data relationships are also the durable moat: scraping is copyable; a data agreement is not.
+
+**9.3.4 Access KPIs.** (a) **Coverage** — % of KB facts served via an automated channel (rungs A–C) vs. requiring D/E; (b) **Channel health** — per-source extraction success rates with canary checks, so a site redesign trips an alert instead of silently serving stale data. These two metrics direct ongoing engineering effort; the census re-runs quarterly because sources move between rungs.
+
+**Compliance guardrails throughout:** robots.txt respected; no circumvention of authentication walls; per-source ToS review; counsel input on public-data access posture. Being the identified, polite, citing actor is both the legal and the partnership-friendly position.
+
+### 9.4 Trust presentation & legal posture
 
 - Verification status is a first-class UI element: ✅ *verified today at source* / 🕐 *verified N days ago* / ⚠️ *could not re-verify — last confirmed [date]*.
 - Every report: "This report is informational and not legal advice. Requirements are set by state licensing boards; confirm with the board before acting. Every fact above links to its official source." Exact language via counsel review (NFR-8).
@@ -415,7 +439,7 @@ MVP launches with the freemium consumer model; B2B follows once accuracy metrics
 | Risk | Impact | Mitigation |
 |------|--------|------------|
 | **Source volatility/breakage** — board sites restructure; extraction adapters break silently | Wrong or missing facts | Per-source adapters with extraction-confidence monitoring; canary sweeps; alert on extraction anomaly; fall back to stale-flagged data, never silent failure (FR-22) |
-| **Scraping/ToS constraints & bot protection** — a board objects to automated access, or bot-protection blocks fetches. *Confirmed real during PRD research: fsbpt.org, ptcompact.org, apta.org, and several state board domains returned 403 to automated fetching.* | Loss of a Tier-1 source | Robots compliance + identified user-agent + polite rates from day one (NFR-5); pursue official data relationships with FSBPT/boards; residential-grade fetch infrastructure evaluated against ToS; evidence snapshots + manual-verification fallback workflow; treat this as a Phase-0 spike, not an assumption |
+| **Scraping/ToS constraints & bot protection** — a board objects to automated access, or bot-protection blocks fetches. *Confirmed real during PRD research: fsbpt.org, ptcompact.org, apta.org, and several state board domains returned 403 to automated fetching.* | Loss of a Tier-1 source | Full source access strategy in §9.3: Phase-0 access census, per-source escalation ladder (official data → statute/code channels → polite fetch → licensed vendors → human-in-the-loop ops), day-one FSBPT/Compact partnership track, and coverage/channel-health KPIs |
 | **LLM hallucination** in extraction or narrative | Trust-destroying inaccuracies | Narrative generation constrained to verified `Fact` records only; schema-constrained extraction with evidence snippets; confidence thresholds route ambiguity to human review; report-level audit sampling |
 | **Liability** — user acts on wrong info, suffers licensure delay/denial | Legal + reputational | NFR-8 disclaimers via counsel; citations to primary sources on every fact; accuracy incident process; E&O insurance |
 | **Wait-time data unavailable** for boards that don't publish it | Weakest link in the core promise | Tiered honesty: official published times where available; labeled estimates otherwise; community-reported actuals (P2) clearly separated from official data |
@@ -426,8 +450,8 @@ MVP launches with the freemium consumer model; B2B follows once accuracy metrics
 
 ## 13. Release Plan / Phasing
 
-### Phase 0 — Foundation (KB seeding)
-Schema + seeding agents + human review tooling. Seed all jurisdictions for PT/PTA licensure paths (initial, endorsement, compact). Internal accuracy audit against a hand-built golden set for ~10 states. **Exit:** ≥ 99% accuracy on golden set.
+### Phase 0 — Foundation (KB seeding + source access)
+Schema + seeding agents + human review tooling. **Source access census** (§9.3.1) across all ~70–100 source domains, producing the access matrix and per-source channel assignments; **FSBPT / PT Compact Commission partnership outreach begins** (§9.3.3). Seed all jurisdictions for PT/PTA licensure paths (initial, endorsement, compact). Internal accuracy audit against a hand-built golden set for ~10 states. **Exit:** ≥ 99% accuracy on golden set; access matrix complete with ≥ 80% of fact classes reachable via automated channels (rungs A–C) or an explicit D/E plan for the remainder.
 
 ### Phase 1 — MVP: Location reports (Mode C)
 City/state + role → full verified Practice Requirements Report with all three licensure paths, live wait-time verification, cost/timeline totals, citations, PDF export. No accounts required (email capture for report delivery). **Exit:** public launch, latency + accuracy targets met.
