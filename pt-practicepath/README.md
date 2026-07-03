@@ -51,4 +51,4 @@ blocking; the report header records the environment via `CENSUS_ENV`.
 - [x] Seeding agents (LLM extraction constrained to the `Fact` schema) + human review tooling (`src/seeding/`)
 - [ ] Run the seeding pipeline from production egress with Anthropic credentials; review + audit Texas for real
 - [ ] Re-verify all `[verify]`-flagged facts from PRD §15; flip golden-set entries from `unverified` to `verified`
-- [ ] Golden sets for ~9 more states; run the seeding-accuracy audit
+- [x] Golden sets for 10 jurisdictions (tx, ca, fl, ny, wa, in, la, mn, nv, sc) — audit runs once seeding executes from production egress
