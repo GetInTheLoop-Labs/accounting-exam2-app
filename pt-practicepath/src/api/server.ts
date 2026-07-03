@@ -12,6 +12,9 @@
 
 import { createServer as createHttpServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { randomUUID } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { JURISDICTIONS, SOURCES } from '../sources/registry.js';
 import { assembleReport, type Report } from '../engine/report.js';
 import { UnknownJurisdictionError, type TherapistProfile } from '../engine/paths.js';
@@ -69,6 +72,14 @@ export function createApiServer(factStore: FactStore = new GoldenFactStore()): S
   async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const url = new URL(req.url ?? '/', 'http://localhost');
     const route = `${req.method} ${url.pathname}`;
+
+    if (route === 'GET /' || route === 'GET /index.html') {
+      const webDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '../web');
+      const html = await readFile(path.join(webDir, 'index.html'), 'utf8');
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+      res.end(html);
+      return;
+    }
 
     if (route === 'GET /v1/jurisdictions') {
       sendJson(res, 200, {
