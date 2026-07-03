@@ -10,12 +10,18 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "census": "tsx src/census/probe.ts"
+    "census": "tsx src/census/probe.ts",
+    "seed": "tsx src/seeding/cli.ts seed",
+    "seed-review": "tsx src/seeding/cli.ts review",
+    "seed-audit": "tsx src/seeding/cli.ts audit"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "tsx": "^4.19.0",
     "typescript": "^5.7.0",
     "vitest": "^4.1.9"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.110.0"
   }
 }

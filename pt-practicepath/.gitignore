@@ -2,3 +2,7 @@ node_modules/
 # Census output is environment-specific measurement data; generate per-run
 # with `npm run census` and archive production runs elsewhere.
 census/
+# Seeding artifacts are per-run working data (proposed facts awaiting review,
+# fetched-page evidence snapshots). Approved facts graduate to the KB, not git.
+data/seeds/
+data/evidence/

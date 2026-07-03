@@ -21,7 +21,7 @@
       "status": "verified"
     },
     {
-      "requirementId": "tx-jurisprudence-jam",
+      "requirementId": "tx-jurisprudence",
       "factClass": "fee",
       "expected": "0",
       "unit": "usd",
@@ -30,7 +30,7 @@
       "note": "Free for initial licensure; $48 (+1.6% card fee) on renewal/restoration"
     },
     {
-      "requirementId": "tx-jurisprudence-jam",
+      "requirementId": "tx-jurisprudence",
       "factClass": "rule",
       "expected": "75 multiple-choice questions, open-book, online on-demand, 140-minute limit, 80% to pass",
       "sourceUrl": "https://ptot.texas.gov/pt-jam/",
