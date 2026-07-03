@@ -501,7 +501,7 @@ Recruiter workspaces, API access for staffing agencies, design-partner conversio
 | Fact | Value | Source |
 |------|-------|--------|
 | Mechanism | Home-state license in an active member state → purchase per-state "compact privilege" for remote member states; issuance typically within minutes; privilege expires with home-state license | https://ptcompact.org/process-and-requirements/ |
-| Membership (as reported 2026-04-29) | 37 jurisdictions active (incl. DC) **[verify roster — Nevada inferred as 37th]**; enacted-not-active: CT, ME, RI; introduced: IL, MA, MI; no legislation: CA, FL, HI, ID, MN, NM, NY, PR, USVI, WY | https://ptcompact.org/compact-map/ |
+| Membership (as reported 2026-04-29) | 37 jurisdictions active (incl. DC) — Nevada confirmed as the 37th, issuing since 2026-01-20 per the NV board's compact page (resolved 2026-07-03 during source enumeration); enacted-not-active: CT, ME, RI; introduced: IL, MA, MI; no legislation: CA, FL, HI, ID, MN, NM, NY, PR, USVI, WY | https://ptcompact.org/compact-map/ |
 | Fees | $45 Commission fee + remote-state fee $0–$300 per privilege (e.g., AZ/SC $45 total; TX +$50; WA +$45+$2; MS $195 total) | https://ptcompact.org/Compact-Privilege-Fee-Jurisprudence-and-Waiver-Table |
 | Jurisprudence for privileges | Some remote states require their jurisprudence exam before privilege issuance (e.g., AZ AZLAW, WA, TX JAM) | https://ptcompact.org/process-and-requirements/ |
 | Eligibility | Home-state residency (driver's license as proof; military exceptions); no license encumbrance; no discipline within prior 2 years | https://ptcompact.org/am-i-eligible/ |
