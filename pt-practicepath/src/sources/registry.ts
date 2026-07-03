@@ -8,6 +8,7 @@
 // the census discovers and verifies them, we never seed unverified URLs.
 
 import type { Issuer, Jurisdiction, Source } from '../kb/types.js';
+import { BOARD_PAGES } from './boards.js';
 
 export const NATIONAL_ISSUERS: Issuer[] = [
   { id: 'fsbpt', name: 'Federation of State Boards of Physical Therapy', kind: 'fsbpt', url: 'https://www.fsbpt.org' },
@@ -43,13 +44,16 @@ const JURISDICTION_NAMES: Record<string, string> = {
   pr: 'Puerto Rico', vi: 'U.S. Virgin Islands',
 };
 
-// PT Compact status as researched 2026-07-03 (PRD §15.2). Active roster had
-// one unresolved member (Nevada inferred as the 37th) — marked [verify] in
-// the PRD; the census re-confirms against ptcompact.org/compact-map/.
+// PT Compact status as researched 2026-07-03 (PRD §15.2), updated by the
+// enumeration pass: Nevada confirmed as the 37th active member — the Nevada
+// board began issuing privileges 2026-01-20 (ptboard.nv.gov compact page;
+// ptcompact.org/State/NV). Background sweeps re-confirm the roster against
+// ptcompact.org/compact-map/.
 const COMPACT_ACTIVE = new Set([
   'al', 'ak', 'az', 'ar', 'co', 'de', 'dc', 'ga', 'in', 'ia', 'ks', 'ky',
-  'la', 'md', 'ms', 'mo', 'mt', 'ne', 'nh', 'nj', 'nc', 'nd', 'oh', 'ok',
-  'or', 'pa', 'sc', 'sd', 'tn', 'tx', 'ut', 'vt', 'va', 'wa', 'wv', 'wi',
+  'la', 'md', 'ms', 'mo', 'mt', 'ne', 'nv', 'nh', 'nj', 'nc', 'nd', 'oh',
+  'ok', 'or', 'pa', 'sc', 'sd', 'tn', 'tx', 'ut', 'vt', 'va', 'wa', 'wv',
+  'wi',
 ]);
 const COMPACT_ENACTED_NOT_ACTIVE = new Set(['ct', 'me', 'ri']);
 
@@ -59,24 +63,26 @@ export const JURISDICTIONS: Jurisdiction[] = Object.entries(JURISDICTION_NAMES).
     name,
     boardIssuerId: `board-${id}`,
     compactMember: COMPACT_ACTIVE.has(id) || COMPACT_ENACTED_NOT_ACTIVE.has(id),
-    ...(COMPACT_ACTIVE.has(id) ? { compactActiveDate: '2026-04-29' } : {}), // as-of date of researched roster, not join date
-    ...(id === 'nv' ? { notes: 'Possible 37th active compact member — unresolved in research, [verify] against compact map' } : {}),
+    ...(COMPACT_ACTIVE.has(id)
+      ? { compactActiveDate: id === 'nv' ? '2026-01-20' : '2026-04-29' } // nv = verified issuing start; others = as-of date of researched roster
+      : {}),
   }),
 );
 
-/** Placeholder issuers for boards not yet located; census fills in name/url. */
-export const UNLOCATED_BOARD_ISSUERS: Issuer[] = JURISDICTIONS.filter(
+/** Board issuers located by the enumeration pass (src/sources/boards.ts). */
+export const LOCATED_BOARD_ISSUERS: Issuer[] = JURISDICTIONS.filter(
   (j) => !RESEARCHED_BOARD_ISSUERS.some((b) => b.id === j.boardIssuerId),
-).map((j) => ({
-  id: j.boardIssuerId,
-  name: `${j.name} physical therapy licensing board (locate via census)`,
-  kind: 'state_board' as const,
-}));
+).map((j) => {
+  const pages = BOARD_PAGES[j.id];
+  return pages
+    ? { id: j.boardIssuerId, name: pages.boardName, kind: 'state_board' as const, url: pages.boardUrl }
+    : { id: j.boardIssuerId, name: `${j.name} physical therapy licensing board (locate via census)`, kind: 'state_board' as const };
+});
 
 export const ALL_ISSUERS: Issuer[] = [
   ...NATIONAL_ISSUERS,
   ...RESEARCHED_BOARD_ISSUERS,
-  ...UNLOCATED_BOARD_ISSUERS,
+  ...LOCATED_BOARD_ISSUERS,
 ];
 
 /**
@@ -128,13 +134,59 @@ export const SOURCES: Source[] = [
   { id: 'ny-ce', issuerId: 'board-ny', url: 'https://www.op.nysed.gov/professions/physical-therapists/continuing-education/faqs', description: 'CE: 36 hours per 3-year registration', factClasses: ['rule'], accessRung: 'unassessed' },
   { id: 'ny-processing', issuerId: 'board-ny', description: 'NYSED publishes no processing times (research finding, PRD §15.3) — wait time must be served as a labeled estimate; rung E until an official channel emerges', factClasses: ['wait_time'], accessRung: 'E_human_verification' },
 
-  // ── Enumeration backlog: one fee-schedule + processing-time + application
-  //    source per remaining jurisdiction, located by the census ───────────
+  // ── Located by the enumeration pass (src/sources/boards.ts): fee,
+  //    application (+ endorsement where a dedicated page exists), and
+  //    processing-time sources per remaining jurisdiction ─────────────────
   ...JURISDICTIONS.filter((j) => !['ca', 'tx', 'fl', 'ny'].includes(j.id)).flatMap(
-    (j): Source[] => [
-      { id: `${j.id}-fees`, issuerId: j.boardIssuerId, description: `${j.name} fee schedule (locate via census)`, factClasses: ['fee'], accessRung: 'unassessed' },
-      { id: `${j.id}-application`, issuerId: j.boardIssuerId, description: `${j.name} application instructions, initial + endorsement (locate via census)`, factClasses: ['rule', 'url'], accessRung: 'unassessed' },
-      { id: `${j.id}-processing`, issuerId: j.boardIssuerId, description: `${j.name} processing times, if published (locate via census)`, factClasses: ['wait_time'], accessRung: 'unassessed' },
-    ],
+    (j): Source[] => {
+      const pages = BOARD_PAGES[j.id];
+      if (!pages) {
+        return [
+          { id: `${j.id}-fees`, issuerId: j.boardIssuerId, description: `${j.name} fee schedule (locate via census)`, factClasses: ['fee'], accessRung: 'unassessed' },
+          { id: `${j.id}-application`, issuerId: j.boardIssuerId, description: `${j.name} application instructions (locate via census)`, factClasses: ['rule', 'url'], accessRung: 'unassessed' },
+          { id: `${j.id}-processing`, issuerId: j.boardIssuerId, description: `${j.name} processing times, if published (locate via census)`, factClasses: ['wait_time'], accessRung: 'unassessed' },
+        ];
+      }
+      return [
+        {
+          id: `${j.id}-fees`,
+          issuerId: j.boardIssuerId,
+          ...(pages.fees ? { url: pages.fees.url } : {}),
+          description: pages.fees
+            ? `${j.name} fees — ${pages.fees.note ?? 'fee page'}`
+            : `${j.name} fees: no public fee page found; stated inside application system/materials (probe application source)`,
+          factClasses: ['fee'],
+          accessRung: 'unassessed',
+        },
+        {
+          id: `${j.id}-application`,
+          issuerId: j.boardIssuerId,
+          ...(pages.application ? { url: pages.application.url } : {}),
+          description: `${j.name} application instructions${pages.endorsement ? ' (initial)' : ' (initial + endorsement)'} — ${pages.application?.note ?? 'locate via census'}`,
+          factClasses: ['rule', 'url'],
+          accessRung: 'unassessed',
+        },
+        ...(pages.endorsement
+          ? [{
+              id: `${j.id}-endorsement`,
+              issuerId: j.boardIssuerId,
+              url: pages.endorsement.url,
+              description: `${j.name} endorsement application — ${pages.endorsement.note ?? 'dedicated page'}`,
+              factClasses: ['rule', 'url'] as Source['factClasses'],
+              accessRung: 'unassessed' as const,
+            }]
+          : []),
+        {
+          id: `${j.id}-processing`,
+          issuerId: j.boardIssuerId,
+          ...(pages.processing ? { url: pages.processing.url } : {}),
+          description: pages.processing
+            ? `${j.name} processing times — ${pages.processing.note ?? 'published page'}`
+            : `${j.name} processing times: not published — serve wait time as labeled estimate (rung E) until an official channel emerges`,
+          factClasses: ['wait_time'],
+          accessRung: pages.processing ? 'unassessed' : 'E_human_verification',
+        },
+      ];
+    },
   ),
 ];
