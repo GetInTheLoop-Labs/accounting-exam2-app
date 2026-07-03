@@ -1,0 +1,38 @@
+{
+  "jurisdiction": "mn",
+  "builtFrom": "golden-set research pass",
+  "verifiedAt": "2026-07-03",
+  "entries": [
+    {
+      "requirementId": "mn-application-initial",
+      "factClass": "fee",
+      "expected": "242",
+      "unit": "usd",
+      "sourceUrl": "https://mn.gov/boards/physical-therapy/applicants/applications/fees/",
+      "status": "verified",
+      "note": "New-graduate total: $100 permanent licensure + $60 annual + $32 CBC + $50 exam processing; temporary permit $25 extra"
+    },
+    {
+      "requirementId": "mn-fingerprints",
+      "factClass": "fee",
+      "expected": "32",
+      "unit": "usd",
+      "sourceUrl": "https://mn.gov/boards/physical-therapy/applicants/applications/fees/",
+      "status": "unverified",
+      "note": "Board fees page shows $32.00 and components sum to $242, but the MN eLicense portal still shows $33.25 — live discrepancy, re-check before audit use"
+    },
+    {
+      "requirementId": "mn-ce-renewal",
+      "factClass": "rule",
+      "expected": "20 contact hours per 2-year cycle, including a minimum of 2 hours on professional ethics directly related to PT practice",
+      "sourceUrl": "https://mn.gov/boards/physical-therapy/license/continuingeducation/requirements/",
+      "status": "verified",
+      "note": "Annual renewal ($60/yr) but biennial CE cycle starting Jan 1 after initial licensure; MN Rules 5601.2100-5601.2700"
+    }
+  ],
+  "omitted": [
+    "mn-jurisprudence: no jurisprudence exam in Minnesota",
+    "mn-license-issuance: no official processing-time page found",
+    "mn-compact-privilege: CONFLICT — registry/PRD roster lists MN as no-legislation, but Minn. Stat. §148.699 (enacted, board news June 2024) says otherwise; ptcompact.org fee chart un-indexable (403). Resolve MN compact status against ptcompact.org before seeding"
+  ]
+}

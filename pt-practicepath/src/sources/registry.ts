@@ -57,6 +57,10 @@ const COMPACT_ACTIVE = new Set([
 ]);
 const COMPACT_ENACTED_NOT_ACTIVE = new Set(['ct', 'me', 'ri']);
 
+const JURISDICTION_NOTES: Record<string, string> = {
+  mn: 'Compact status CONFLICT: the researched roster (as-of 2026-04-29) lists MN as no-legislation, but Minn. Stat. §148.699 exists (board news June 2024) — resolve against ptcompact.org before serving compact guidance for Minnesota',
+};
+
 export const JURISDICTIONS: Jurisdiction[] = Object.entries(JURISDICTION_NAMES).map(
   ([id, name]) => ({
     id,
@@ -66,6 +70,7 @@ export const JURISDICTIONS: Jurisdiction[] = Object.entries(JURISDICTION_NAMES).
     ...(COMPACT_ACTIVE.has(id)
       ? { compactActiveDate: id === 'nv' ? '2026-01-20' : '2026-04-29' } // nv = verified issuing start; others = as-of date of researched roster
       : {}),
+    ...(JURISDICTION_NOTES[id] ? { notes: JURISDICTION_NOTES[id] } : {}),
   }),
 );
 

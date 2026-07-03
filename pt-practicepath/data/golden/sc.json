@@ -1,0 +1,37 @@
+{
+  "jurisdiction": "sc",
+  "builtFrom": "golden-set research pass",
+  "verifiedAt": "2026-07-03",
+  "entries": [
+    {
+      "requirementId": "sc-application-initial",
+      "factClass": "fee",
+      "expected": "110",
+      "unit": "usd",
+      "sourceUrl": "https://www.llr.sc.gov/pt/fees.aspx",
+      "status": "verified",
+      "note": "Same for PT and PTA; NPTE fee to FSBPT is separate"
+    },
+    {
+      "requirementId": "sc-fingerprints",
+      "factClass": "rule",
+      "expected": "Fingerprint-based SLED state check plus FBI national check required for initial licensure (SC Code 40-45-220 and 40-45-240); applicant pays; fingerprints via IdentoGO only after application submission and board instructions",
+      "sourceUrl": "https://llr.sc.gov/pt/backgroundchecks.aspx",
+      "status": "verified",
+      "note": "Dollar amount not published on the board's indexed pages — rule only"
+    },
+    {
+      "requirementId": "sc-ce-renewal",
+      "factClass": "rule",
+      "expected": "30 hours (3.0 CEUs) per biennium; at least 15 hours from certified activities including 3 hours of ethics or professionalism; reported through CE Broker before renewal",
+      "sourceUrl": "https://llr.sc.gov/pt/ce.aspx",
+      "status": "verified",
+      "note": "2026-renewal reporting period: Jan 1, 2025 – Dec 31, 2026"
+    }
+  ],
+  "omitted": [
+    "sc-jurisprudence: no jurisprudence exam in South Carolina (NPTE only)",
+    "sc-license-issuance: no official processing-time page found",
+    "sc-compact-privilege fee: secondary sources say $45 total ($0 state fee) but not confirmable on an official domain — confirm on ptcompact.org fee chart"
+  ]
+}
