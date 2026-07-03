@@ -13,7 +13,8 @@
     "census": "tsx src/census/probe.ts",
     "seed": "tsx src/seeding/cli.ts seed",
     "seed-review": "tsx src/seeding/cli.ts review",
-    "seed-audit": "tsx src/seeding/cli.ts audit"
+    "seed-audit": "tsx src/seeding/cli.ts audit",
+    "report": "tsx src/engine/report-cli.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

@@ -6,3 +6,5 @@ census/
 # fetched-page evidence snapshots). Approved facts graduate to the KB, not git.
 data/seeds/
 data/evidence/
+# Demo reports are generated artifacts (npm run report)
+data/report-*.md
